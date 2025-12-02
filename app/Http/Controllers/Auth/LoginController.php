@@ -36,7 +36,6 @@ class LoginController extends Controller
             return response()->json(['message' => 'Cuenta no verificada'], 403);
         }
 
-
         //$user->tokens()->delete();
         $tokenName = $credentials['email'] ?? $credentials['cliente'];
         $token = $user->createToken($tokenName)->plainTextToken;
