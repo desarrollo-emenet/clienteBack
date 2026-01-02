@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\verifyEmail;
+use App\Service\clientService;
+
+use App\Models\Service;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -12,8 +14,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
+
+
 //use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
@@ -21,18 +25,15 @@ class UserController extends Controller
 
 
     public static $rules = [
-        'cliente'   => 'required|string|max:5|unique:users,cliente',
-        'name'      => 'nullable|sometimes|string|max:255',
-        'last_name' => 'nullable|sometimes|string|max:255',
-        'phone'     => 'nullable|sometimes|string|max:10|regex:/^\d+$/',
-        'email'     => 'required|string|max:255|unique:users,email',
+        'numero_cliente'   => 'required|string|max:10|unique:services,numero_cliente',
+        'email'     => 'required|email|unique:users,email',
         'password'  => 'required|string|min:8',
     ];
 
     public static $rulesUpdate = [
-        'name'      => 'sometimes|string|max:255',
-        'last_name' => 'sometimes|string|max:255',
-        'phone'     => 'sometimes|string|max:10|regex:/^\d+$/',
+        //'name'      => 'sometimes|string|max:255',
+        //'last_name' => 'sometimes|string|max:255',
+        //'phone'     => 'sometimes|string|max:10|regex:/^\d+$/',
         'email'     => 'sometimes|required|email|max:255',
         'password'  => 'sometimes|string|min:8',
 
@@ -44,56 +45,95 @@ class UserController extends Controller
         return User::all();
     }
 
+
     public function store(Request $request)
     {
-        //
-        $cliente = $request->cliente;
+        //validar datos
+        $request->validate([
+            'numero_cliente' => 'required|string',
+        ]);
 
-        //crear peticion con cabecera
-        $peticion = Http::withHeaders([
-            'Accept' => 'application/json',
-            'x-web-key' => 'web_9825f8agd35dfd4bg15fsd3a94c947a28896d5fd58gjh0f251a38912a'
-        ])
-            ->withoutVerifying()
-            ->get('https://dev.emenet.mx/api/clientesV2/' . $cliente);
+        $validacion = clientService::validarClienteCompleto($request->numero_cliente);
 
-        //en caso de fallar la peticion
-        if ($peticion->failed()) {
-            if ($peticion->status() === 404) {
-                return response()->json([
-                    'message' => 'El número de cliente no existe.',
-                    'detalles' => $peticion->body()
-                ], 404);
-            }
+        if($validacion instanceof \Illuminate\Http\JsonResponse){
+            return $validacion;
+        }
+        
+        $data = $request->validate(self::$rules);
+
+
+        // Extraer datos validados
+        $numEncriptado = $data['numero_cliente'];
+        $numeroCliente = $validacion['numero'];
+        $clienteData = $validacion['clienteData'];
+
+        try {
+            $data['password'] = Hash::make($data['password']);
+
+            // Transacción completa
+            $user = DB::transaction(function () use ($data, $numEncriptado) {
+                //guardar en tabla users email y password
+                $user = User::create([
+                    'email'    => $data['email'],
+                    'password' => $data['password'],
+                ]);
+                //guardar en tabla services numero de cliente
+                Service::create([
+                    'numero_cliente' => $numEncriptado,
+                    'user_id' => $user->id,
+                ]);
+
+                //Evento de registro
+                event(new Registered($user));
+
+                return $user;
+            });
+
+            return response()->json([
+                'mensaje' => 'Registro creado correctamente',
+                'user'    => $user,
+            ], 201);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Error al crear la cuenta',
+                'error'   => $e->getMessage(),
+            ], 422);
+        }
+    }
+
+
+    public function clientePorNumero(Request $request, $numero)
+    {
+        $user = $request->user();
+        if (! $user) {
+            return response()->json(['message' => 'No autenticado'], 401);
         }
 
-        $clienteData = $peticion->json();
+        // Verificar que el numero_cliente pertenece al usuario
+        $servicio = Service::where('numero_cliente', $numero)
+            ->where('user_id', $user->id)
+            ->first();
 
-        //si ya existe
-        $existeUsuario = User::where('cliente', $cliente)->exists();
-        if ($existeUsuario) {
-            return response()->json([
-                'message' => 'Este cliente ya tiene una cuenta registrada.'
-            ], 409);
-        }        
+        if (!$servicio) {
+            // 404 si no existe
+            return response()->json(['message' => 'Servicio no encontrado o no pertenece al usuario'], 404);
+        }
 
-        $data = $request->validate(self::$rules);
-        $data['password'] = Hash::make($data['password']);
-
-        $user = DB::transaction(fn() => User::create($data));
-
+        $datosCliente = clientService::obtenerDatosCliente($numero, true);
         
-        //$user->sendEmailVerificationNotification();
-        event(new Registered($user));
+        if ($datosCliente instanceof \Illuminate\Http\JsonResponse) {
+            return $datosCliente; // Retornar error si hubo problema al obtener datos
+        }
 
-        Log::info('Evento Registered disparado', ['user_id' => $user->id]);
-        //Mail::to($user->email)->send(new verifyEmail());
-        
+        $clienteData = $datosCliente['clienteData'];
+
+
+        // devolver info local y externa
         return response()->json([
-            'mensaje' => 'Registro Creado',
-            'data'    => $user,
+            'servicio' => $servicio,
             'cliente' => $clienteData,
-        ], 201);
+            'numero_cliente' => $numero,
+        ], 200);
     }
 
 
@@ -102,7 +142,7 @@ class UserController extends Controller
     {
         //
         $user = User::findOrFail($id);
-        
+
 
         $servicios = [
             'estadoCuenta' => [
@@ -193,7 +233,7 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy()
     {
         //
     }
