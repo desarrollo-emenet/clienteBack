@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Service\clientService;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Command\Command as ConsoleCommand;
 
 class numClienteCodificado extends Command
 {
@@ -50,15 +51,15 @@ class numClienteCodificado extends Command
                 
             } else {
                 $this->error("Acción inválida. Use: codificar o descodificar");
-                return Command::FAILURE;
+                return ConsoleCommand::FAILURE;
             }
             
             $this->info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-            return Command::SUCCESS;
+            return ConsoleCommand::SUCCESS;
             
         } catch (\Exception $e) {
             $this->error("Error: " . $e->getMessage());
-            return Command::FAILURE;
+            return ConsoleCommand::FAILURE;
         }
     }
 }
