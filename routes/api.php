@@ -8,6 +8,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\FormController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
 
@@ -64,3 +65,8 @@ Route::post('auth/login', LoginController::class);
 Route::get('auth/logout', [LogoutController::class, 'logout'])->middleware('auth:sanctum');
 
 //Route::get('/ruta-con-log', function () {return 'Esta ruta registrará sus encabezados';})->middleware('logear.encabezados');
+
+
+
+//ruta formulario de correo
+Route::post('/send-email', [FormController::class, 'send']);

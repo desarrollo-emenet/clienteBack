@@ -15,6 +15,7 @@ class RecoverPasswordMail extends Mailable
     use Queueable, SerializesModels;
 
     public $token;
+    public $URLAPI;
     public $url;
 
     /**
@@ -24,12 +25,13 @@ class RecoverPasswordMail extends Mailable
      */
     public function __construct($token)
     {
-        //
+        //Transformar el token a string en caso de que venga como objeto
         $this->token = is_object($token) ? (string) ($token->token ?? json_encode($token)) : (string) $token;
-
-        $this->url = 'http://localhost:4200/response-password?token=' . urlencode($this->token);
-        //$this->url = 'http://192.168.110.101:4200/response-password?token=' . urlencode($this->token);
-        Log::info('Recover URL: ' . $this->url);
+        //obtener la URL del frontend desde el .env
+        $this->URLAPI = env('FRONTEND_URL_LOCAL');
+        //Generar la URL de recuperacion de contraseña
+        $this->url = $this->URLAPI . '/response-password?token=' . urlencode($this->token);
+        //Log::info('Recover URL: ' . $this->url);
     }
 
     /**
