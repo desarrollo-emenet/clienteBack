@@ -62,7 +62,6 @@ class clientService
                 ], 403);
             }
         }
-
         return $clienteData;
     }
 
@@ -120,7 +119,6 @@ class clientService
             return $clienteData; // Error en API
         }
 
-
         return [
             'numero' => $numeroCliente,
             'clienteData' => $clienteData
@@ -141,7 +139,7 @@ class clientService
     private const OFFSET_CODIGO = 334260; // B: offset de encriptación
     private const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     
-    // ✅ Inverso multiplicativo de 1 mod 1000000 es 1
+    //  Inverso multiplicativo de 1 mod 1000000 es 1
     private const INV_ENC = 1;
 
     // ==========================================
