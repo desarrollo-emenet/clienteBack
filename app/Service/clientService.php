@@ -13,13 +13,13 @@ class clientService
 {
     //CODIGOS DE CLIENTE - VALIDACIONES Y CONEXION A API EXTERNA
     // Función para obtener datos del cliente desde API
-    public static function peticionAPI(string $numeroCliente)
+    public static function peticionAPI(string $numeroCliente, string $conexion)
     {
         $peticion = Http::withHeaders([
             'Accept' => 'application/json',
             'x-web-key' => 'web_9825f8agd35dfd4bg15fsd3a94c947a28896d5fd58gjh0f251a38912a'
         ])->withoutVerifying()
-            ->get('https://isp-back.emenet.mx/api/clientesV2/' . $numeroCliente . '?conexion=false'  );
+            ->get('https://isp-back.emenet.mx/api/clientesV2/' . $numeroCliente . '?conexion=' . $conexion);
 
         if ($peticion->failed()) {
             return null; // Retornar null para indicar error en la petición
@@ -31,13 +31,12 @@ class clientService
     public static function obtenerCliente( $numEncriptado)
     {
         //Descodificar número
-        //$cliente = self::descodificarClienteConLetra($numEncriptado);
         $cliente = codificacionService::descodificarClienteConLetra($numEncriptado);
         if ($cliente instanceof JsonResponse) {
             return $cliente; // Error en descodificación
         }
         // Realizar petición a la API externa
-         $clienteData = self::peticionAPI($cliente);
+         $clienteData = self::peticionAPI($cliente, 'true');
 
         if ($clienteData === null) {
             return response()->json([
@@ -52,7 +51,7 @@ class clientService
     public static function validarClienteAPI(string $numeroCliente, bool $verificarBaja = true)
     {
         
-        $clienteData = self::peticionAPI($numeroCliente);
+        $clienteData = self::peticionAPI($numeroCliente, 'false');
 
         if ($clienteData === null) {
             return response()->json([

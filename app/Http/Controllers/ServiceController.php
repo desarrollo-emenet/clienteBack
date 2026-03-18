@@ -23,12 +23,15 @@ class ServiceController extends Controller
 
     public function index(Request $request)
     {
+        // Obtener el usuario autenticado
         $user = $request->user();
         $servicios = $user->servicios()->orderBy('id', 'desc')->get();
 
+        // Obtener datos de clientes para cada servicio
         $clientesData = [];
         try {
             foreach ($servicios as $servicio) {
+                // Obtener datos del cliente usando el número de cliente encriptado
                 $clientesData[$servicio->id] = clientService::obtenerCliente(
                     (string) $servicio->numero_cliente
                 );

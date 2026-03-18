@@ -29,6 +29,7 @@ class RecoveryPasswordController extends Controller
     {
         $email = $request->input('email');
 
+        // Verificar que el email exista en la base de datos
         if (!$this->validateEmail($email)) {
             return response()->json([
                 "status" => "error",
@@ -47,23 +48,28 @@ class RecoveryPasswordController extends Controller
 
     public function send($email)
     {
-
+        // Crear token de recuperación de contraseña
         $token = $this->createToken($email);
 
+        //
         Log::info('Enviando correo de recuperación. Token (preview): ' . substr($token, 0, 8) . '...');
-
+        // Enviar correo de recuperación de contraseña
         Mail::to($email)->send(new RecoverPasswordMail($token));
     }
 
     public function createToken($email)
     {
+        // Verificar si ya existe un token para este email
         $oldToken = DB::table('password_resets')->where('email', $email)->first();
 
+        // Si ya existe un token, reutilizarlo
         if ($oldToken && isset($oldToken->token)) {
             return (string) $oldToken->token;
         }
 
+        // Si no existe un token, crear uno nuevo
         $token = Str::random(60);
+        // Guardar el token usando el método saveToken
         $this->saveToken($token, $email);
 
         return $token;
@@ -71,8 +77,10 @@ class RecoveryPasswordController extends Controller
 
     public function saveToken($token, $email)
     {
+        // Verificar si ya existe un registro para este email
         $exists = DB::table('password_resets')->where('email', $email)->exists();
 
+        // Si existe, actualizar el token y la fecha de creación; si no, crear un nuevo registro
         if ($exists) {
             DB::table('password_resets')->where('email', $email)->update([
                 'token' => $token,
@@ -94,10 +102,13 @@ class RecoveryPasswordController extends Controller
 
     public function updatePassword(Request $request)
     {
+        // Validar datos de entrada
         $data = $request->validate(self::$rulesUpdate);
 
+        // Verificar que el token exista y sea válido
         $oldToken = DB::table('password_resets')->where('token', $data['token'])->first();
 
+        // Si el token no existe, retornar error
         if (!$oldToken) {
             return response()->json(['message' => 'Token inválido o inexistente.'], 400);
         }
@@ -114,6 +125,7 @@ class RecoveryPasswordController extends Controller
             ]);
         }
 
+        // Buscar el usuario asociado al token
         $user = User::where('email', $oldToken->email)->first();
 
         if (!$user) {
@@ -122,6 +134,7 @@ class RecoveryPasswordController extends Controller
             ], 404);
         }
 
+        // Actualizar la contraseña del usuario
         $user->password = Hash::make($data['password']);
         $user->save();
 

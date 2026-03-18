@@ -45,7 +45,7 @@ class FormController extends Controller
                 new FormMail($request->only(['nombre', 'telefono', 'correo', 'mensaje']))
             );
 
-            Log::info('Correo enviado correctamente a ' . config('mail.to_address') . ' desde ' . $request->input('correo'));
+            //Log::info('Correo enviado correctamente a ' . config('mail.to_address') . ' desde ' . $request->input('correo'));
 
             return response()->json([
                 'success' => true,
