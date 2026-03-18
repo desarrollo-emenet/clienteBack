@@ -69,6 +69,7 @@ class clientService
     //verificar si ya existe el cliente en BD
     public static function verificarCliente(string $numEncriptado): ?JsonResponse
     {
+        //revisa el registro de servicios para el numero_cliente encriptado
         if (Service::where('numero_cliente', $numEncriptado)->exists()) {
             return response()->json([
                 'message' => 'El número de cliente ya está registrado en el sistema.'

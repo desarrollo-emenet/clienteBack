@@ -30,7 +30,6 @@ class UserController extends Controller
 
     public function index()
     {
-        //
         return User::all();
     }
 
@@ -42,12 +41,14 @@ class UserController extends Controller
             'numero_cliente' => 'required|string',
         ]);
 
+        // Validar el cliente con el servicio
         $validacion = clientService::validarClienteCompleto($request->numero_cliente);
 
-        if($validacion instanceof \Illuminate\Http\JsonResponse){
+        // Si la validación devuelve un error, retornar esa respuesta
+        if ($validacion instanceof \Illuminate\Http\JsonResponse) {
             return $validacion;
         }
-        
+
         $data = $request->validate(self::$rules);
 
 
@@ -98,64 +99,74 @@ class UserController extends Controller
             return response()->json(['message' => 'No autenticado'], 401);
         }
 
-        // Verificar que el numero_cliente pertenece al usuario
-        $servicio = Service::where('numero_cliente', $numero)
-            ->where('user_id', $user->id)
-            ->first();
+        try {
+            // Verificar que el numero_cliente pertenece al usuario
+            $servicio = Service::where('numero_cliente', $numero)
+                ->where('user_id', $user->id)
+                ->first();
 
-        if (!$servicio) {
-            // 404 si no existe
-            return response()->json(['message' => 'Servicio no encontrado o no pertenece al usuario'], 404);
+            if (!$servicio) {
+                return response()->json(['message' => 'Servicio no encontrado o no pertenece al usuario'], 404);
+            }
+
+            $datosCliente = clientService::obtenerDatosCliente($numero, true);
+
+            if ($datosCliente instanceof \Illuminate\Http\JsonResponse) {
+                return $datosCliente; // Retornar error si hubo problema al obtener datos
+            }
+
+            $clienteData = $datosCliente['clienteData'];
+
+            // devolver info local y externa
+            return response()->json([
+                'servicio' => $servicio,
+                'cliente' => $clienteData,
+                'numero_cliente' => $numero,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al obtener el cliente',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        $datosCliente = clientService::obtenerDatosCliente($numero, true);
-        
-        if ($datosCliente instanceof \Illuminate\Http\JsonResponse) {
-            return $datosCliente; // Retornar error si hubo problema al obtener datos
-        }
-
-        $clienteData = $datosCliente['clienteData'];
-
-
-        // devolver info local y externa
-        return response()->json([
-            'servicio' => $servicio,
-            'cliente' => $clienteData,
-            'numero_cliente' => $numero,
-        ], 200);
     }
-
 
 
     public function update(Request $request, $id)
     {
-        //
         $user = User::findOrFail($id);
 
-        $validated = $request->validate(array_merge(self::$rulesUpdate, [
-            'email' => ['sometimes', 'required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-        ]));
+        try {
+            // Validar datos
+            $validated = $request->validate(array_merge(self::$rulesUpdate, [
+                'email' => ['sometimes', 'required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            ]));
 
-        if (!empty($validated['password'])) {
-            $validated['password'] = Hash::make($validated['password']);
-        } else {
-            unset($validated['password']);
+            // Si se proporciona una nueva contraseña, encriptarla
+            if (!empty($validated['password'])) {
+                $validated['password'] = Hash::make($validated['password']);
+            } else { //sino eliminar el campo password para no actualizarlo a null
+                unset($validated['password']);
+            }
+
+            // Actualizar el usuario dentro de una transacción
+            DB::transaction(fn() => $user->update($validated));
+
+            // Devolver el usuario actualizado
+            return response()->json([
+                'mensaje' => 'Registro Actualizado',
+                'data'    => $user->fresh(),    
+            ]);
+
+        }catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al encontrar el usuario',
+                'error' => $e->getMessage()
+            ], 404);
         }
-
-        DB::transaction(fn() => $user->update($validated));
-
-        return response()->json([
-            'mensaje' => 'Registro Actualizado',
-            'data'    => $user->fresh(),
-        ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy()
     {
         //

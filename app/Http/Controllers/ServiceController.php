@@ -14,12 +14,10 @@ class ServiceController extends Controller
     //
     public function __construct()
     {
-        //
         $this->middleware('auth:sanctum');
     }
     public static $rules = [
         'numero_cliente'   => 'required|string|max:10|unique:services,numero_cliente',
-
     ];
 
 
@@ -54,9 +52,9 @@ class ServiceController extends Controller
 
     public function AddService(Request $request)
     {
-
         $data = $request->validate(self::$rules);
 
+        //valida el cliente con el servicio
         $validacion = clientService::validarClienteCompleto($data['numero_cliente']);
 
         if ($validacion instanceof \Illuminate\Http\JsonResponse) {
@@ -72,7 +70,6 @@ class ServiceController extends Controller
         $userId = $request->user()->id; // requiere auth
         $servicio = null;
 
-
         try {
             DB::transaction(function () use (&$servicio, $userId, $numEncriptado) {
                 $servicio = Service::create([
@@ -81,6 +78,7 @@ class ServiceController extends Controller
                 ]);
             });
 
+            //retornar el servicio creado junto con los datos del cliente
             return response()->json([
                 'mensaje' => 'Registro Creado',
                 'data'    => $servicio,
@@ -99,6 +97,7 @@ class ServiceController extends Controller
     {
         $user = $request->user();
 
+        // Verificar que el usuario esté autenticado
         if (!$user) {
             return response()->json([
                 'has_access' => false,
@@ -106,25 +105,36 @@ class ServiceController extends Controller
             ], 401);
         }
 
-        $servicio = Service::where('numero_cliente', $numero)
-            ->where('user_id', $user->id)
-            ->first();
+        try {
+            // Verificar que el numero_cliente pertenece al usuario
+            $servicio = Service::where('numero_cliente', $numero)
+                ->where('user_id', $user->id)
+                ->first();
 
-        if ($servicio) {
+                // Si el servicio existe, el usuario tiene acceso
+            if ($servicio) {
+                return response()->json([
+                    'has_access' => true,
+                    'servicio' => [
+                        'id' => $servicio->id,
+                        'numero_cliente' => $servicio->numero_cliente,
+                        'user_id' => $servicio->user_id
+                    ]
+                ], 200);
+            } else {
+                // Si no existe, el usuario no tiene acceso
+                return response()->json([
+                    'has_access' => false,
+                    'message' => 'No tienes acceso a este servicio'
+                ], 403);
+            }
+        } catch (\Exception $e) {
             return response()->json([
-                'has_access' => true,
-                'servicio' => [
-                    'id' => $servicio->id,
-                    'numero_cliente' => $servicio->numero_cliente,
-                    'user_id' => $servicio->user_id
-                ]
-            ], 200);
+                'has_access' => false,
+                'message' => 'Error al verificar acceso',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        return response()->json([
-            'has_access' => false,
-            'message' => 'No tienes acceso a este servicio'
-        ], 403);
     }
 
     public function destroy(Request $request, $id)
@@ -132,19 +142,31 @@ class ServiceController extends Controller
         //
         $user = $request->user();
 
-        $service = Service::where('id', $id)
-            ->where('user_id', $user->id)
-            ->firstOrFail();
+        try {
+            // Verificar que el servicio pertenece al usuario
+            $service = Service::where('id', $id)
+                ->where('user_id', $user->id)
+                ->firstOrFail();
 
-        $totalServicios = Service::where('user_id', $user->id)->count();
+            // Verificar que el usuario tenga al menos un servicio antes de eliminar
+            $totalServicios = Service::where('user_id', $user->id)->count();
 
-        if ($totalServicios <= 1) {
+            // Si solo tiene un servicio, no permitir eliminar
+            if ($totalServicios <= 1) {
+                return response()->json([
+                    'message' => 'tu cuenta debe tener al menos un servicio'
+                ], 409);
+            }
+
+            // Eliminar el servicio
+            $service->delete();
+            return response()->json(['message' => 'Servicio eliminado'], 200);
+
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'tu cuenta debe tener al menos un servicio'
-            ], 409);
+                'message' => 'Error al eliminar el servicio',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        $service->delete();
-        return response()->json(['message' => 'Servicio eliminado'], 200);
     }
 }
