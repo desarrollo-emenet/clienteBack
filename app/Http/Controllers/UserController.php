@@ -18,12 +18,12 @@ class UserController extends Controller
 {
     public static $rules = [
         'numero_cliente'   => 'required|string|max:6|unique:services,numero_cliente',
-        'email'     => 'required|email|unique:users,email',
+        //'email'     => 'required|email|unique:users,email',
         'password'  => 'required|string|min:8',
     ];
 
     public static $rulesUpdate = [
-        'email'     => 'sometimes|required|email|max:255',
+        //'email'     => 'sometimes|required|email|max:255',
         'password'  => 'sometimes|string|min:8',
 
     ];
@@ -36,11 +36,6 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        //validar datos
-        $request->validate([
-            'numero_cliente' => 'required|string',
-        ]);
-
         // Validar el cliente con el servicio
         $validacion = clientService::validarClienteCompleto($request->numero_cliente);
 
@@ -49,27 +44,29 @@ class UserController extends Controller
             return $validacion;
         }
 
-        $data = $request->validate(self::$rules);
+        $clienteData = $validacion['clienteData']; // Extraer los datos del cliente validado
+        $email = $validacion['email']; // Extraer el email del cliente validado
+
+        $data = $request->validate(self::$rules); // Validar los datos de entrada 
 
 
         // Extraer datos validados
-        $numEncriptado = $data['numero_cliente'];
-        $numeroCliente = $validacion['numero'];
-        $clienteData = $validacion['clienteData'];
+        $numCliente = $data['numero_cliente'];
 
         try {
             $data['password'] = Hash::make($data['password']);
 
             // Transacción completa
-            $user = DB::transaction(function () use ($data, $numEncriptado) {
+            $user = DB::transaction(function () use ($clienteData, $data, $numCliente, $email) {
+
                 //guardar en tabla users email y password
                 $user = User::create([
-                    'email'    => $data['email'],
+                    'email'    => $email,
                     'password' => $data['password'],
                 ]);
                 //guardar en tabla services numero de cliente
                 Service::create([
-                    'numero_cliente' => $numEncriptado,
+                    'numero_cliente' => $numCliente,
                     'user_id' => $user->id,
                 ]);
 
@@ -83,11 +80,11 @@ class UserController extends Controller
                 'mensaje' => 'Registro creado correctamente',
                 'user'    => $user,
             ], 201);
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al crear la cuenta',
-                'error'   => $e->getMessage(),
-            ], 422);
+                //'message' => 'Error al crear la cuenta',
+                'message'   => $e->getMessage(),
+            ]);
         }
     }
 
@@ -123,7 +120,6 @@ class UserController extends Controller
                 'cliente' => $clienteData,
                 'numero_cliente' => $numero,
             ], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al obtener el cliente',
@@ -156,10 +152,9 @@ class UserController extends Controller
             // Devolver el usuario actualizado
             return response()->json([
                 'mensaje' => 'Registro Actualizado',
-                'data'    => $user->fresh(),    
+                'data'    => $user->fresh(),
             ]);
-
-        }catch (\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al encontrar el usuario',
                 'error' => $e->getMessage()

@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Models\Service;
+use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -45,6 +46,34 @@ class clientService
         }
 
         return $clienteData;
+    }
+
+    public static function obtenerEmail(array $clienteData): ?string
+    {
+        // Extraer el email del clienteData
+        $email = $clienteData['cliente']['email'] ?? null;
+
+        //$email = "crismart12ne@gmail.com"; // Email fijo para pruebas
+
+        if (!$email) {
+            return response()->json([
+                'message' => 'El cliente no tiene un correo electrónico asociado, por favor contacte a un agente para resolver este problema.'
+            ], 422);
+            
+            //throw new Exception('El cliente no tiene un correo electrónico asociado, por favor contacte a un agente para resolver este problema.');
+        }
+
+        $userExistente = User::where('email', $email)->exists();
+
+        // Si el email ya existe, retornar un error
+        if ($userExistente) {
+            return response()->json([
+                'message' => 'Este correo ya está registrado',
+            ], 409);
+            //throw new Exception('Este correo ya está registrado');
+        }
+
+        return $email;
     }
 
     //Validar numero de cliente con la API
@@ -106,10 +135,16 @@ class clientService
             return $errorExistente;
         }
 
+        $clienteEmail = self::obtenerEmail($clienteData);
+        if ($clienteEmail instanceof JsonResponse) {
+            return $clienteEmail; // Error al obtener email
+        }
+
         // retornar datos
         return [
             'numero' => $numeroCliente,
-            'clienteData' => $clienteData
+            'clienteData' => $clienteData,
+            'email' => $clienteEmail
         ];
     }
 
