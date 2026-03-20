@@ -17,7 +17,7 @@ class ServiceController extends Controller
         $this->middleware('auth:sanctum');
     }
     public static $rules = [
-        'numero_cliente'   => 'required|string|max:10|unique:services,numero_cliente',
+        'numero_cliente'   => 'required|string|max:6|unique:services,numero_cliente',
     ];
 
 
@@ -65,7 +65,7 @@ class ServiceController extends Controller
         }
 
         // Extraer datos validados
-        $numEncriptado = $data['numero_cliente'];
+        $num = $data['numero_cliente'];
         $numeroCliente = $validacion['numero'];
         $clienteData = $validacion['clienteData'];
 
@@ -74,9 +74,9 @@ class ServiceController extends Controller
         $servicio = null;
 
         try {
-            DB::transaction(function () use (&$servicio, $userId, $numEncriptado) {
+            DB::transaction(function () use (&$servicio, $userId, $num) {
                 $servicio = Service::create([
-                    'numero_cliente' => $numEncriptado, //guardar numero encriptado
+                    'numero_cliente' => $num, //guardar numero de cliente
                     'user_id' => $userId,
                 ]);
             });

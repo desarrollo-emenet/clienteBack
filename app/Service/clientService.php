@@ -28,15 +28,15 @@ class clientService
     }
 
 
-    public static function obtenerCliente( $numEncriptado)
+    public static function obtenerCliente( $cliente)
     {
         //Descodificar número
-        $cliente = codificacionService::descodificarClienteConLetra($numEncriptado);
+        /*$cliente = codificacionService::descodificarClienteConLetra($numEncriptado);
         if ($cliente instanceof JsonResponse) {
             return $cliente; // Error en descodificación
-        }
+        }*/
         // Realizar petición a la API externa
-         $clienteData = self::peticionAPI($cliente, 'true');
+         $clienteData = self::peticionAPI($cliente, 'false');
 
         if ($clienteData === null) {
             return response()->json([
@@ -74,10 +74,10 @@ class clientService
 
 
     //verificar si ya existe el cliente en BD
-    public static function verificarCliente(string $numEncriptado): ?JsonResponse
+    public static function verificarCliente(string $numCliente): ?JsonResponse
     {
         //revisa el registro de servicios para el numero_cliente encriptado
-        if (Service::where('numero_cliente', $numEncriptado)->exists()) {
+        if (Service::where('numero_cliente', $numCliente)->exists()) {
             return response()->json([
                 'message' => 'El número de cliente ya está registrado en el sistema.'
             ], 409);
@@ -86,13 +86,13 @@ class clientService
     }
 
 
-    public static function validarClienteCompleto(string $numEncriptado)
+    public static function validarClienteCompleto(string $numeroCliente)
     {
         //Descodificar número
-        $numeroCliente = codificacionService::descodificarClienteConLetra($numEncriptado);
+        /*$numeroCliente = codificacionService::descodificarClienteConLetra($numEncriptado);
         if ($numeroCliente instanceof JsonResponse) {
             return $numeroCliente; // Error en descodificación
-        }
+        }*/
 
         // Validar con API 
         $clienteData = self::validarClienteAPI($numeroCliente, true);
@@ -101,7 +101,7 @@ class clientService
         }
 
         //Verificar si ya existe
-        $errorExistente = self::verificarCliente($numEncriptado);
+        $errorExistente = self::verificarCliente($numeroCliente);
         if ($errorExistente) {
             return $errorExistente;
         }
@@ -116,10 +116,10 @@ class clientService
     public static function obtenerDatosCliente($numeroCliente)
     {
         //decofificar numero de cliente
-        $numeroCliente = codificacionService::descodificarClienteConLetra($numeroCliente);
+        /*$numeroCliente = codificacionService::descodificarClienteConLetra($numeroCliente);
         if ($numeroCliente instanceof JsonResponse) {
             return $numeroCliente; // Error en descodificación
-        }
+        }*/
 
         // Validar con API 
         $clienteData = self::validarClienteAPI($numeroCliente, false);

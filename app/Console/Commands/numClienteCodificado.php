@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Service\clientService;
+use App\Service\codificacionService;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Command\Command as ConsoleCommand;
 
@@ -38,13 +39,13 @@ class numClienteCodificado extends Command
             $this->info("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
             
             if ($accion === 'codificar') {
-                $codigo = clientService::codificarClienteConLetra($valor);
+                $codigo = codificacionService::codificarClienteConLetra($valor);
                 $this->info("  Número original:    {$valor}");
                 $this->line("  ↓");
                 $this->info("  Código encriptado:  {$codigo}");
                 
             } elseif ($accion === 'descodificar') {
-                $numero = clientService::descodificarClienteConLetra($valor);
+                $numero = codificacionService::descodificarClienteConLetra($valor);
                 $this->info("  Código encriptado:  {$valor}");
                 $this->line("  ↓");
                 $this->info("  Número original:    {$numero}");

@@ -17,7 +17,7 @@ use Illuminate\Validation\Rule;
 class UserController extends Controller
 {
     public static $rules = [
-        'numero_cliente'   => 'required|string|max:10|unique:services,numero_cliente',
+        'numero_cliente'   => 'required|string|max:6|unique:services,numero_cliente',
         'email'     => 'required|email|unique:users,email',
         'password'  => 'required|string|min:8',
     ];
@@ -73,7 +73,7 @@ class UserController extends Controller
                     'user_id' => $user->id,
                 ]);
 
-                //Evento de registro
+                //Evento de registro 
                 event(new Registered($user));
 
                 return $user;
@@ -109,7 +109,7 @@ class UserController extends Controller
                 return response()->json(['message' => 'Servicio no encontrado o no pertenece al usuario'], 404);
             }
 
-            $datosCliente = clientService::obtenerDatosCliente($numero, true);
+            $datosCliente = clientService::obtenerDatosCliente($numero);
 
             if ($datosCliente instanceof \Illuminate\Http\JsonResponse) {
                 return $datosCliente; // Retornar error si hubo problema al obtener datos
