@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
 
 //use Illuminate\Support\Facades\Log;
 
@@ -18,19 +17,22 @@ class UserController extends Controller
 {
     public static $rules = [
         'numero_cliente'   => 'required|string|max:6|unique:services,numero_cliente',
-        //'email'     => 'required|email|unique:users,email',
         'password'  => 'required|string|min:8',
     ];
 
     public static $rulesUpdate = [
-        //'email'     => 'sometimes|required|email|max:255',
         'password'  => 'sometimes|string|min:8',
 
     ];
 
     public function index()
     {
-        return User::all();
+        //return User::all();
+        return response()->json([
+            'message' => 'Lista de usuarios',
+            'data' => User::all(),
+            'servicios' => Service::all()
+        ], 200);
     }
 
 
@@ -48,6 +50,9 @@ class UserController extends Controller
         $email = $validacion['email']; // Extraer el email del cliente validado
 
         $data = $request->validate(self::$rules); // Validar los datos de entrada 
+        
+
+         // Verificar si el email ya existe en la tabla users
 
 
         // Extraer datos validados
@@ -82,8 +87,8 @@ class UserController extends Controller
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
-                //'message' => 'Error al crear la cuenta',
-                'message'   => $e->getMessage(),
+                'message' => 'Error al crear la cuenta',
+                'error'   => $e->getMessage(),
             ]);
         }
     }
@@ -136,7 +141,7 @@ class UserController extends Controller
         try {
             // Validar datos
             $validated = $request->validate(array_merge(self::$rulesUpdate, [
-                'email' => ['sometimes', 'required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+                //'email' => ['sometimes', 'required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             ]));
 
             // Si se proporciona una nueva contraseña, encriptarla

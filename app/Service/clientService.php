@@ -3,12 +3,8 @@
 namespace App\Service;
 
 use App\Models\Service;
-use App\Models\User;
-use Exception;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Service\codificacionService;
 
 class clientService
 {
@@ -16,11 +12,14 @@ class clientService
     // Función para obtener datos del cliente desde API
     public static function peticionAPI(string $numeroCliente, string $conexion)
     {
+         $web_key = env('API_WEB');
+         $web_url = env('API_URL');
+
         $peticion = Http::withHeaders([
             'Accept' => 'application/json',
-            'x-web-key' => 'web_9825f8agd35dfd4bg15fsd3a94c947a28896d5fd58gjh0f251a38912a'
+            'x-web-key' => $web_key
         ])->withoutVerifying()
-            ->get('https://isp-back.emenet.mx/api/clientesV2/' . $numeroCliente . '?conexion=' . $conexion);
+            ->get($web_url . $numeroCliente . '?conexion=' . $conexion);
 
         if ($peticion->failed()) {
             return null; // Retornar null para indicar error en la petición
@@ -51,9 +50,9 @@ class clientService
     public static function obtenerEmail(array $clienteData): ?string
     {
         // Extraer el email del clienteData
-        $email = $clienteData['cliente']['email'] ?? null;
+        //$email = $clienteData['cliente']['email'] ?? null;
 
-        //$email = "crismart12ne@gmail.com"; // Email fijo para pruebas
+        $email = "crismart12ne@gmail.com"; // Email fijo para pruebas
 
         if (!$email) {
             return response()->json([
@@ -63,7 +62,7 @@ class clientService
             //throw new Exception('El cliente no tiene un correo electrónico asociado, por favor contacte a un agente para resolver este problema.');
         }
 
-        $userExistente = User::where('email', $email)->exists();
+        /*$userExistente = User::where('email', $email)->exists();
 
         // Si el email ya existe, retornar un error
         if ($userExistente) {
@@ -71,7 +70,7 @@ class clientService
                 'message' => 'Este correo ya está registrado',
             ], 409);
             //throw new Exception('Este correo ya está registrado');
-        }
+        }*/
 
         return $email;
     }
