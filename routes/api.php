@@ -49,6 +49,8 @@ Route::middleware('auth:sanctum')->get('cliente/{numero}', [UserController::clas
 
 Route::get('servicios', [ServiceController::class,  'Index'])->middleware('auth:sanctum');
 Route::post('servicio', [ServiceController::class,  'AddService'])->middleware('auth:sanctum');
+Route::post('servicio/verificar', [ServiceController::class,  'confirmarServicio'])->middleware('auth:sanctum');
+
 Route::delete('servicio/{servicio}', [ServiceController::class,  'destroy'])->middleware('auth:sanctum');
 Route::get('verify-access-service/{numero}', [ServiceController::class, 'verificarAcceso'])->middleware('auth:sanctum');
 
