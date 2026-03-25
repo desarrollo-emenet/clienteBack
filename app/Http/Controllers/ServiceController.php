@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ServiceVerificationMail;
 use App\Service\clientService;
 use App\Models\Service;
+use App\Models\ServiceVerification;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class ServiceController extends Controller
 {
@@ -65,33 +68,90 @@ class ServiceController extends Controller
         }
 
         // Extraer datos validados
-        $num = $data['numero_cliente'];
         $numeroCliente = $validacion['numero'];
-        $clienteData = $validacion['clienteData'];
+        $email = $validacion['email'];
 
         // Crear dentro de transacción y asignar user_id (del usuario autenticado)
         $userId = $request->user()->id; // requiere auth
-        $servicio = null;
+
+        $codigo = rand(100000, 999999); // Generar código de verificación aleatorio
 
         try {
-            DB::transaction(function () use (&$servicio, $userId, $num) {
-                $servicio = Service::create([
-                    'numero_cliente' => $num, //guardar numero de cliente
+            DB::transaction(function () use ($userId, $numeroCliente, $codigo) {
+                //si hay registro anterior se elimina
+                ServiceVerification::where('user_id', $userId)
+                    ->where('numero_cliente', $numeroCliente)
+                    ->delete();
+
+                // Crear el registro de verificación asociado
+                ServiceVerification::create([
+                    'numero_cliente' => $numeroCliente,
+                    'codigo' => $codigo,
+                    'expires_at' => now()->addMinutes(10), //expira el codigo en 10 minutos 
                     'user_id' => $userId,
                 ]);
             });
 
-            //retornar el servicio creado junto con los datos del cliente
+            //enviar correo con el codigo de verificacion
+            Mail::to($email)->send(new ServiceVerificationMail($codigo));
+
             return response()->json([
-                'mensaje' => 'Registro Creado',
-                'data'    => $servicio,
-                'cliente' => $clienteData,
+                'message' => 'Código de verificación enviado correctamente.',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al verificar el servicio',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function confirmarServicio(Request $request)
+    {
+        $data = $request->validate([
+            'numero_cliente' => 'required|string|max:6',
+            'codigo' => 'required|digits:6',
+        ]);
+
+        $userId = $request->user()->id;
+
+        //verificar que el codigo y numero_cliente coincidan con el registro de verificacion
+        $verificacion = ServiceVerification::where('user_id', $userId)
+            ->where('numero_cliente', $data['numero_cliente'])
+            ->where('codigo', $data['codigo'])
+            ->first();
+
+        if (!$verificacion) {
+            return response()->json([
+                'message' => 'Código incorrecto.'
+            ], 400);
+        }
+
+        if ($verificacion->isExpired()) {
+            return response()->json([
+                'message' => 'El código de verificación ha expirado.'
+            ], 400);
+        }
+        
+        //agregar el servicio al usuario y eliminar el registro de verificacion
+        try {
+            DB::transaction(function () use ($verificacion, $userId) {
+
+                Service::create([
+                    'numero_cliente' => $verificacion->numero_cliente,
+                    'user_id' => $userId,
+                ]);
+                $verificacion->delete();
+            });
+
+            return response()->json([
+                'message' => 'Servicio agregado correctamente'
             ], 201);
-        } catch (QueryException $e) {
+        } catch (\Throwable $e) {
             return response()->json([
-                'message' => 'Error al crear el servicio',
-                'error' => $e->getMessage(),
-            ], 422);
+                'message' => 'Error al confirmar',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
