@@ -52,13 +52,13 @@ class clientService
         // Extraer el email del clienteData
         //$email = $clienteData['cliente']['email'] ?? null;
 
-        $email = "crismart12ne@gmail.com"; // Email fijo para pruebas
+        $email = "desarrollo@emenet.mx"; // Email fijo para pruebas
 
         if (!$email) {
             return response()->json([
                 'message' => 'El cliente no tiene un correo electrónico asociado, por favor contacte a un agente para resolver este problema.'
             ], 422);
-            
+
             //throw new Exception('El cliente no tiene un correo electrónico asociado, por favor contacte a un agente para resolver este problema.');
         }
 
@@ -78,7 +78,7 @@ class clientService
     //Validar numero de cliente con la API
     public static function validarClienteAPI(string $numeroCliente, bool $verificarBaja = true)
     {
-        
+
         $clienteData = self::peticionAPI($numeroCliente, 'false');
 
         if ($clienteData === null) {
@@ -87,7 +87,7 @@ class clientService
             ], 422);
         }
 
-        //Verificar clasificación de baja 
+        //Verificar clasificación de baja
         if ($verificarBaja) {
             $clasificacion = $clienteData['cliente']['clasificacion'] ?? null;
 
@@ -122,7 +122,7 @@ class clientService
             return $numeroCliente; // Error en descodificación
         }*/
 
-        // Validar con API 
+        // Validar con API
         $clienteData = self::validarClienteAPI($numeroCliente, true);
         if ($clienteData instanceof JsonResponse) {
             return $clienteData; // Error en API
@@ -155,7 +155,7 @@ class clientService
             return $numeroCliente; // Error en descodificación
         }*/
 
-        // Validar con API 
+        // Validar con API
         $clienteData = self::validarClienteAPI($numeroCliente, false);
         if ($clienteData instanceof JsonResponse) {
             return $clienteData; // Error en API
