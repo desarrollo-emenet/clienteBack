@@ -3,10 +3,12 @@
 namespace App\Service\servicios;
 
 use App\Mail\ServiceVerificationMail;
+use App\Models\Service;
 use App\Models\ServiceVerification;
 use App\Service\clientService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -84,5 +86,32 @@ class clientesService
                 "mensaje" => "No se realizo el envio del correo de verificación "
             ], 500);
         }
+    }
+
+
+    public function destroy($id)
+    {
+        // Verificar que el servicio pertenece al usuario
+        $service = Service::where('id', $id)->where('user_id', Auth::user()->id)
+            ->firstOrFail();
+
+        if (!$service) return response()->json([
+            'status' => 'error',
+            'errors' => 'No se encontró información del recurso solicitado'
+        ], 404);
+
+        // Verificar que el usuario tenga al menos un servicio antes de eliminar
+        $totalServicios = Service::where('user_id', Auth::user()->id)->count();
+
+        // Si solo tiene un servicio, no permitir eliminar
+        if ($totalServicios <= 1) return response()->json([
+            'status' => 'error',
+            'message' => 'tu cuenta debe tener al menos un servicio'
+        ], 409);
+
+        // Eliminar el servicio
+        $service->delete();
+        DB::commit();
+        return response()->json(['message' => 'Servicio eliminado'], 200);
     }
 }

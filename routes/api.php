@@ -32,8 +32,7 @@ route::middleware(['auth:sanctum'])->group(function (){
     Route::get('auth/logout', [authController::class, 'logout']);
 
 
-    Route::apiResource('servicios', serviciosController::class)->only("index", "store");
-    // Route::post('servicio', [serviciosController::class, 'AddService']);
+    Route::apiResource('servicios', serviciosController::class)->only("index", "store", "destroy");
     Route::post('servicio/verificar', [ServiceController::class,  'confirmarServicio']);
 });
 
@@ -56,7 +55,7 @@ Route::middleware('auth:sanctum')->get('cliente/{numero}', [UserController::clas
 
 
 
-Route::delete('servicio/{servicio}', [ServiceController::class,  'destroy'])->middleware('auth:sanctum');
+
 Route::get('verify-access-service/{numero}', [ServiceController::class, 'verificarAcceso'])->middleware('auth:sanctum');
 
 

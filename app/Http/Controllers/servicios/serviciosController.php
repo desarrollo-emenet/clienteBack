@@ -51,7 +51,19 @@ class serviciosController extends Controller
                 'mensaje' => 'Error al obtener datos de clientes. ' . $th->getMessage(),
             ], 500);
         }
+    }
 
-
+    public function destroy($id)
+    {
+        try {
+            DB::beginTransaction();
+            return $this->clientesService->destroy($id);
+        } catch (Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'mensaje' => 'Error al eliminar el servicio. ' . $th->getMessage(),
+            ], 500);
+        }
     }
 }
