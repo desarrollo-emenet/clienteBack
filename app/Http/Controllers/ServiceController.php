@@ -87,7 +87,7 @@ class ServiceController extends Controller
                 ServiceVerification::create([
                     'numero_cliente' => $numeroCliente,
                     'codigo' => $codigo,
-                    'expires_at' => now()->addMinutes(10), //expira el codigo en 10 minutos 
+                    'expires_at' => now()->addMinutes(10), //expira el codigo en 10 minutos
                     'user_id' => $userId,
                 ]);
             });
@@ -132,7 +132,7 @@ class ServiceController extends Controller
                 'message' => 'El código de verificación ha expirado.'
             ], 400);
         }
-        
+
         //agregar el servicio al usuario y eliminar el registro de verificacion
         try {
             DB::transaction(function () use ($verificacion, $userId) {

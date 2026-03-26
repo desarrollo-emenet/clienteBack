@@ -1,15 +1,13 @@
 <?php
 
 use App\Http\Controllers\Auth\authController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\RecoveryPasswordController;
 use App\Http\Controllers\Auth\VerifyMailController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\servicios\serviciosController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\FormController;
 
 
 /*prueba
@@ -24,10 +22,19 @@ use App\Http\Controllers\FormController;
 */
 
 Route::post('auth/login', [authController::class, 'login']);
+// Route::apiResource('servicios', serviciosController::class)->only("index");
+
+// Route::get('/servicios', [ServiceController::class, 'index2']);
+
+
 
 route::middleware(['auth:sanctum'])->group(function (){
     Route::get('auth/logout', [authController::class, 'logout']);
 
+
+    Route::apiResource('servicios', serviciosController::class)->only("index", "store");
+    // Route::post('servicio', [serviciosController::class, 'AddService']);
+    Route::post('servicio/verificar', [ServiceController::class,  'confirmarServicio']);
 });
 
 
@@ -47,9 +54,7 @@ Route::apiResource('usuarios',UserController::class);
 Route::middleware('auth:sanctum')->get('cliente/{numero}', [UserController::class, 'clientePorNumero']);
 
 
-Route::get('servicios', [ServiceController::class,  'Index'])->middleware('auth:sanctum');
-Route::post('servicio', [ServiceController::class,  'AddService'])->middleware('auth:sanctum');
-Route::post('servicio/verificar', [ServiceController::class,  'confirmarServicio'])->middleware('auth:sanctum');
+
 
 Route::delete('servicio/{servicio}', [ServiceController::class,  'destroy'])->middleware('auth:sanctum');
 Route::get('verify-access-service/{numero}', [ServiceController::class, 'verificarAcceso'])->middleware('auth:sanctum');

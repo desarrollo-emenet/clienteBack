@@ -18,12 +18,12 @@ class authController extends Controller
 
     public function login(Request $request)
     {
-        try {
-            $request->validate([
-                'cliente' => ['required', 'string'],
-                'password' => ['required', 'string'],
-            ], [], ['cliente' => 'Cliente', 'password' => "Contraseña",]);
+        $request->validate([
+            'cliente' => ['required', 'string'],
+            'password' => ['required', 'string'],
+        ], [], ['cliente' => 'Cliente', 'password' => "Contraseña",]);
 
+        try {
             return $this->authService->login($request);
         } catch (Throwable $th) {
             return response()->json([
