@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Models\Service;
+use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -52,7 +53,7 @@ class clientService
         // Extraer el email del clienteData
         //$email = $clienteData['cliente']['email'] ?? null;
 
-        $email = "desarrollo@emenet.mx"; // Email fijo para pruebas
+        $email = "crismart12ne@gmail.com"; // Email fijo para pruebas
 
         if (!$email) {
             return response()->json([
@@ -62,7 +63,7 @@ class clientService
             //throw new Exception('El cliente no tiene un correo electrónico asociado, por favor contacte a un agente para resolver este problema.');
         }
 
-        /*$userExistente = User::where('email', $email)->exists();
+        $userExistente = User::where('email', $email)->exists();
 
         // Si el email ya existe, retornar un error
         if ($userExistente) {
@@ -70,7 +71,7 @@ class clientService
                 'message' => 'Este correo ya está registrado',
             ], 409);
             //throw new Exception('Este correo ya está registrado');
-        }*/
+        }
 
         return $email;
     }

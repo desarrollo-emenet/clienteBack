@@ -30,6 +30,7 @@ class VerifyMailController extends Controller
         // Verificar si el correo ya ha sido verificado regresando al frontend
         if ($user->hasVerifiedEmail()) {
             Cache::put("email_verified_{token}", $user->id, now()->addMinutes(5));
+            //Cache::put("email_verified_{$this->token}", $user->id, now()->addMinutes(5));
             //Log::info($token);
             //Log::info($this->urlFrontend . '/email-verificado?token={$token}' );
 
@@ -42,6 +43,8 @@ class VerifyMailController extends Controller
 
         //si no ha sido verificado antes, generar un token y enviarlo al frontend
         Cache::put("email_verified_{token}", $user->id, now()->addMinutes(5));
+        //Cache::put("email_verified_{$this->token}", $user->id, now()->addMinutes(5));
+        //Log::info($token);
         return redirect($this->urlFrontend . '/email-verificado?token=' . urlencode($this->token));
 
         

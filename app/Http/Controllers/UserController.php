@@ -8,8 +8,11 @@ use App\Models\Service;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Notifications\VerifyEmailNotification;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Nette\Utils\Random;
 
 //use Illuminate\Support\Facades\Log;
 
@@ -17,7 +20,7 @@ class UserController extends Controller
 {
     public static $rules = [
         'numero_cliente'   => 'required|string|max:6|unique:services,numero_cliente',
-        'password'  => 'required|string|min:8',
+        //'password'  => 'required|string|min:8',
     ];
 
     public static $rulesUpdate = [
@@ -50,24 +53,22 @@ class UserController extends Controller
         $email = $validacion['email']; // Extraer el email del cliente validado
 
         $data = $request->validate(self::$rules); // Validar los datos de entrada 
-        
-
-         // Verificar si el email ya existe en la tabla users
-
 
         // Extraer datos validados
         $numCliente = $data['numero_cliente'];
 
         try {
-            $data['password'] = Hash::make($data['password']);
+            //$data['password'] = Hash::make($data['password']);
+            $passwordTemporal = Random::generate(8); 
+            $passwordTemporalhash = hash::make($passwordTemporal);             
 
             // Transacción completa
-            $user = DB::transaction(function () use ($clienteData, $data, $numCliente, $email) {
+            $user = DB::transaction(function () use ($numCliente, $email, $passwordTemporal, $passwordTemporalhash) {
 
                 //guardar en tabla users email y password
                 $user = User::create([
                     'email'    => $email,
-                    'password' => $data['password'],
+                    'password' => $passwordTemporalhash, //contraseña temporal
                 ]);
                 //guardar en tabla services numero de cliente
                 Service::create([
@@ -76,7 +77,9 @@ class UserController extends Controller
                 ]);
 
                 //Evento de registro 
-                event(new Registered($user));
+                //event(new Registered($user));
+                $user->notify(new VerifyEmailNotification($passwordTemporal));
+
 
                 return $user;
             });
@@ -92,7 +95,6 @@ class UserController extends Controller
             ]);
         }
     }
-
 
     public function clientePorNumero(Request $request, $numero)
     {

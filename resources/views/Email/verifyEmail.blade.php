@@ -49,10 +49,9 @@
                     cellpadding="0" cellspacing="0" role="presentation">
                     <!-- Header -->
                     <tr>
-                        <td >
-                            <img src="{{ $message->embed(public_path('img/emenetLogo.png')) }}" alt="Logo Emenet" width="150"
-
-                                style="max-width: 200px; height: auto; display: block; margin: 0 auto;" />
+                        <td>
+                            <img src="{{ $message->embed(public_path('img/emenetLogo.png')) }}" alt="Logo Emenet"
+                                width="150" style="max-width: 200px; height: auto; display: block; margin: 0 auto;" />
 
                         </td>
                     </tr>
@@ -61,14 +60,21 @@
                     <tr>
                         <td class="inner" style="padding:32px;">
 
-                            <h2 style="margin:0 0 12px 0; font-size:20px; color:#0b2236; font-weight:700;">Verificacion de Correo</h2>
+                            <h2 style="margin:0 0 12px 0; font-size:20px; color:#0b2236; font-weight:700;">Verificacion
+                                de Correo</h2>
 
                             <p style="margin:0 0 18px 0; color:#283142; font-size:14px; line-height:1.6;">
-                                Confirma el correo registrado a tu cuenta de<strong> EMENET Comunicaciones</strong>, para continuar haz click en el siguiente enlace
+                                Confirma el correo registrado a tu cuenta de<strong> EMENET Comunicaciones</strong>,
+                                para continuar haz click en el siguiente enlace
+                            </p>
+
+                            <p style="margin:0 0 18px 0; color:#283142; font-size:14px; line-height:1.6;">
+                                Tu contraseña temporal es: <strong>{{ $passwordTemporal }}</strong>
                             </p>
 
                             <p style="margin:0 0 18px 0; color:#5b6b7a; font-size:13px;">
-                                Por seguridad, este enlace expirará en <strong>{{ config('auth.passwords.users.expire',60) }} minutos</strong>.
+                                Por seguridad, este enlace expirará en
+                                <strong>{{ config('auth.passwords.users.expire', 60) }} minutos</strong>.
                             </p>
 
 
@@ -78,7 +84,7 @@
                                     <td align="center">
                                         <a href="{{ $url }}"
                                             style="background-color:#0b6efd; color:#ffffff; padding:12px 22px; border-radius:6px; font-weight:600; display:inline-block; text-decoration:none; min-width:180px; box-shadow:0 6px 16px rgba(11,110,253,0.14);">
-                                            Verificar correo 
+                                            Verificar correo
                                         </a>
                                     </td>
                                 </tr>

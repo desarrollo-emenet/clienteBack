@@ -19,9 +19,10 @@ class VerifyEmailNotification extends Notification
      *
      * @return void
      */
-    public function __construct()
+    public $passwordTemporal;
+    public function __construct($passwordTemporal)
     {
-        //
+        $this->passwordTemporal = $passwordTemporal;
     }
 
     /**
@@ -65,6 +66,8 @@ class VerifyEmailNotification extends Notification
             ->view('Email.verifyEmail', [
                 'url'  => $url,
                 'user' => $notifiable,
+                'passwordTemporal' => $this->passwordTemporal,
+
             ]);
     }
 

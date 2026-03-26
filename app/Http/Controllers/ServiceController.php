@@ -17,7 +17,7 @@ class ServiceController extends Controller
     //
     public function __construct()
     {
-        $this->middleware('auth:sanctum');
+        // $this->middleware('auth:sanctum');
     }
     public static $rules = [
         'numero_cliente'   => 'required|string|max:6|unique:services,numero_cliente',
