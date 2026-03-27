@@ -9,6 +9,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Notifications\VerifyEmailNotification;
+use App\Service\servicios\validarService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -18,6 +19,14 @@ use Nette\Utils\Random;
 
 class UserController extends Controller
 {
+
+    protected $validarService;
+
+    public function __construct(validarService $validarService)
+    {
+        $this->validarService = $validarService;
+       
+    }
     public static $rules = [
         'numero_cliente'   => 'required|string|max:6|unique:services,numero_cliente',
         //'password'  => 'required|string|min:8',
@@ -113,13 +122,14 @@ class UserController extends Controller
                 return response()->json(['message' => 'Servicio no encontrado o no pertenece al usuario'], 404);
             }
 
-            $datosCliente = clientService::obtenerDatosCliente($numero);
+            //$datosCliente = validarService::validarClienteApi($numero);
+            $datosCliente = $this->validarService->validarClienteAPI($numero);
 
             if ($datosCliente instanceof \Illuminate\Http\JsonResponse) {
                 return $datosCliente; // Retornar error si hubo problema al obtener datos
             }
 
-            $clienteData = $datosCliente['clienteData'];
+            $clienteData = $datosCliente;
 
             // devolver info local y externa
             return response()->json([

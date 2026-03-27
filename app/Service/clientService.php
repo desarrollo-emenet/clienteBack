@@ -4,30 +4,22 @@ namespace App\Service;
 
 use App\Models\Service;
 use App\Models\User;
+use App\Service\servicios\consultaApiService;
+use App\Service\servicios\validarService;
 use Illuminate\Support\Facades\Http;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class clientService
 {
-    //CODIGOS DE CLIENTE - VALIDACIONES Y CONEXION A API EXTERNA
-    // Función para obtener datos del cliente desde API
-    public static function peticionAPI(string $numeroCliente, string $conexion)
+
+    protected $validarService;
+    protected $consultaApiService;
+
+    public function __construct(validarService $validarService, consultaApiService $consultaApiService)
     {
-         $web_key = env('API_WEB');
-         $web_url = env('API_URL');
-
-        $peticion = Http::withHeaders([
-            'Accept' => 'application/json',
-            'x-web-key' => $web_key
-        ])->withoutVerifying()
-            ->get($web_url . $numeroCliente . '?conexion=' . $conexion);
-
-        if ($peticion->failed()) {
-            return null; // Retornar null para indicar error en la petición
-        }
-        return $peticion->json();
+        $this->validarService = $validarService;
+        $this->consultaApiService = $consultaApiService;
     }
-
 
     public static function obtenerCliente( $cliente)
     {
@@ -37,7 +29,7 @@ class clientService
             return $cliente; // Error en descodificación
         }*/
         // Realizar petición a la API externa
-         $clienteData = self::peticionAPI($cliente, 'false');
+         $clienteData = consultaApiService::peticionAPI($cliente, 'false');
 
         if ($clienteData === null) {
             return response()->json([
@@ -48,39 +40,11 @@ class clientService
         return $clienteData;
     }
 
-    public static function obtenerEmail(array $clienteData): ?string
-    {
-        // Extraer el email del clienteData
-        //$email = $clienteData['cliente']['email'] ?? null;
-
-        $email = "crismart12ne@gmail.com"; // Email fijo para pruebas
-
-        if (!$email) {
-            return response()->json([
-                'message' => 'El cliente no tiene un correo electrónico asociado, por favor contacte a un agente para resolver este problema.'
-            ], 422);
-
-            //throw new Exception('El cliente no tiene un correo electrónico asociado, por favor contacte a un agente para resolver este problema.');
-        }
-
-        $userExistente = User::where('email', $email)->exists();
-
-        // Si el email ya existe, retornar un error
-        if ($userExistente) {
-            return response()->json([
-                'message' => 'Este correo ya está registrado',
-            ], 409);
-            //throw new Exception('Este correo ya está registrado');
-        }
-
-        return $email;
-    }
-
     //Validar numero de cliente con la API
     public static function validarClienteAPI(string $numeroCliente, bool $verificarBaja = true)
     {
 
-        $clienteData = self::peticionAPI($numeroCliente, 'false');
+        $clienteData = consultaApiService::peticionAPI($numeroCliente, 'false');
 
         if ($clienteData === null) {
             return response()->json([
@@ -135,7 +99,7 @@ class clientService
             return $errorExistente;
         }
 
-        $clienteEmail = self::obtenerEmail($clienteData);
+        $clienteEmail= validarService::obtenerEmail($clienteData);
         if ($clienteEmail instanceof JsonResponse) {
             return $clienteEmail; // Error al obtener email
         }
@@ -148,14 +112,8 @@ class clientService
         ];
     }
 
-    public static function obtenerDatosCliente($numeroCliente)
+    /*public static function obtenerDatosCliente($numeroCliente)
     {
-        //decofificar numero de cliente
-        /*$numeroCliente = codificacionService::descodificarClienteConLetra($numeroCliente);
-        if ($numeroCliente instanceof JsonResponse) {
-            return $numeroCliente; // Error en descodificación
-        }*/
-
         // Validar con API
         $clienteData = self::validarClienteAPI($numeroCliente, false);
         if ($clienteData instanceof JsonResponse) {
@@ -166,5 +124,5 @@ class clientService
             'numero' => $numeroCliente,
             'clienteData' => $clienteData
         ];
-    }
+    }*/
 }
