@@ -33,7 +33,7 @@ route::middleware(['auth:sanctum'])->group(function (){
 
 
     Route::apiResource('servicios', serviciosController::class)->only("index", "store", "destroy");
-    Route::post('servicio/verificar', [ServiceController::class,  'confirmarServicio']);
+    Route::post('servicios/verificar', [serviciosController::class, 'confirmarServicio']);
 });
 
 
@@ -51,10 +51,6 @@ Route::post('/email/verification-notification', function (Request $request) {
 //rutas controlador usuario
 Route::apiResource('usuarios',UserController::class);
 Route::middleware('auth:sanctum')->get('cliente/{numero}', [UserController::class, 'clientePorNumero']);
-
-
-
-
 
 Route::get('verify-access-service/{numero}', [ServiceController::class, 'verificarAcceso'])->middleware('auth:sanctum');
 

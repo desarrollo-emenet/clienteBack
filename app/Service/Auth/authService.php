@@ -5,15 +5,19 @@ namespace App\Service\Auth;
 use App\Models\Service;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class authService
 {
     public function login($request)
     {
         $user = User::from('users as u')
+            ->select('u.*')
             ->join("services as s", 'u.id', 's.user_id')
             ->where('email', $request->cliente)
             ->orWhere('numero_cliente', $request->cliente)->first();
+
+        Log::info($user);
 
         if (!$user || !Hash::check($request->password, $user->password)) return response()->json([
             'status' => "error",
