@@ -66,4 +66,23 @@ class serviciosController extends Controller
             ], 500);
         }
     }
+
+    public function confirmarServicio(Request $request)
+    {
+        $request->validate([
+            'numero_cliente' => 'required|string|max:6',
+            'codigo' => 'required|digits:6',
+        ]);
+
+        try {
+            DB::beginTransaction();
+            return $this->clientesService->confirmarServicio($request);
+        } catch (Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 'error',
+                'mensaje' => 'Error al confirmar. ' . $th->getMessage(),
+            ], 500);
+        }
+    }
 }

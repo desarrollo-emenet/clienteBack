@@ -114,4 +114,37 @@ class clientesService
         DB::commit();
         return response()->json(['message' => 'Servicio eliminado'], 200);
     }
+
+    public function confirmarServicio($request)
+    {
+        $userId = $request->user()->id;
+        //verificar que el codigo y numero_cliente coincidan con el registro de verificacion
+        $verificacion = ServiceVerification::where('user_id', $userId)
+            ->where('numero_cliente', $request->numero_cliente)
+            ->where('codigo', $request->codigo)
+            ->first();
+
+        if (!$verificacion) return response()->json([
+            "status" => "error",
+            'message' => 'Código incorrecto.'
+        ], 400);
+
+        if ($verificacion->isExpired()) return response()->json([
+            "status" => "error",
+            'message' => 'El código de verificación ha expirado.'
+        ], 400);
+
+        //agregar el servicio al usuario y eliminar el registro de verificacion
+
+        Service::create([
+            'numero_cliente' => $verificacion->numero_cliente,
+            'user_id' => $userId,
+        ]);
+        $verificacion->delete();
+        DB::commit();
+        return response()->json([
+            "status" => "success",
+            'message' => 'Servicio agregado correctamente'
+        ], 201);
+    }
 }
