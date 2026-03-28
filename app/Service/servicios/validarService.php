@@ -72,7 +72,7 @@ class validarService
             'message' => 'El correo del cliente no es valido o no esta registrado.'
         ], 422);
 
-        $userExistente = User::where('email', $email)->exists();
+        /*$userExistente = User::where('email', $email)->exists();
 
         // Si el email ya existe, retornar un error
         if ($userExistente) {
@@ -80,7 +80,7 @@ class validarService
                 'message' => 'Este correo ya está registrado',
             ], 409);
             //throw new Exception('Este correo ya está registrado');
-        }
+        }*/
 
         return $email;
     }

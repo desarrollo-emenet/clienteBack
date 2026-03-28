@@ -33,6 +33,7 @@ route::middleware(['auth:sanctum'])->group(function (){
 
 
     Route::apiResource('servicios', serviciosController::class)->only("index", "store", "destroy");
+    //Route::post('servicio', [ServiceController::class, 'AddService']);
     Route::post('servicios/verificar', [serviciosController::class, 'confirmarServicio']);
 });
 

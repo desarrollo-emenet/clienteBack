@@ -69,6 +69,7 @@ class ServiceController extends Controller
 
         // Extraer datos validados
         $numeroCliente = $validacion['numero'];
+        //Log::info("Número de cliente validado: " . $numeroCliente);
         $email = $validacion['email'];
 
         // Crear dentro de transacción y asignar user_id (del usuario autenticado)
