@@ -111,18 +111,4 @@ class clientService
             'email' => $clienteEmail
         ];
     }
-
-    /*public static function obtenerDatosCliente($numeroCliente)
-    {
-        // Validar con API
-        $clienteData = self::validarClienteAPI($numeroCliente, false);
-        if ($clienteData instanceof JsonResponse) {
-            return $clienteData; // Error en API
-        }
-
-        return [
-            'numero' => $numeroCliente,
-            'clienteData' => $clienteData
-        ];
-    }*/
 }
