@@ -84,4 +84,18 @@ class validarService
 
         return $email;
     }
+
+    public static function obtenerCliente( $cliente)
+    {
+        // Realizar petición a la API externa
+         $clienteData = consultaApiService::peticionAPI($cliente, 'false');
+
+        if ($clienteData === null) {
+            return response()->json([
+                'message' => 'Error al obtener datos externos',
+            ], 422);
+        }
+
+        return $clienteData;
+    }
 }

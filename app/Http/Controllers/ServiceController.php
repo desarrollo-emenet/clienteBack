@@ -6,7 +6,7 @@ use App\Mail\ServiceVerificationMail;
 use App\Service\clientService;
 use App\Models\Service;
 use App\Models\ServiceVerification;
-use Illuminate\Database\QueryException;
+use App\Service\servicios\validarService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -15,9 +15,11 @@ use Illuminate\Support\Facades\Mail;
 class ServiceController extends Controller
 {
     //
-    public function __construct()
+    protected $validarService;
+
+    public function __construct(validarService $validarService)
     {
-        // $this->middleware('auth:sanctum');
+        $this->validarService = $validarService;
     }
     public static $rules = [
         'numero_cliente'   => 'required|string|max:6|unique:services,numero_cliente',
@@ -35,7 +37,7 @@ class ServiceController extends Controller
         try {
             foreach ($servicios as $servicio) {
                 // Obtener datos del cliente usando el número de cliente encriptado
-                $clientesData[$servicio->id] = clientService::obtenerCliente(
+                $clientesData[$servicio->id] = $this->validarService->obtenerCliente(
                     (string) $servicio->numero_cliente
                 );
             }
@@ -61,7 +63,7 @@ class ServiceController extends Controller
         $data = $request->validate(self::$rules);
 
         //valida el cliente con el servicio
-        $validacion = clientService::validarClienteCompleto($data['numero_cliente']);
+        $validacion = $this->validarService->validarClienteCompleto($data['numero_cliente']);
 
         if ($validacion instanceof \Illuminate\Http\JsonResponse) {
             return $validacion; // Retornar error si hubo problema en validación
@@ -175,7 +177,7 @@ class ServiceController extends Controller
                 ->where('user_id', $user->id)
                 ->first();
 
-                // Si el servicio existe, el usuario tiene acceso
+            // Si el servicio existe, el usuario tiene acceso
             if ($servicio) {
                 return response()->json([
                     'has_access' => true,
@@ -225,7 +227,6 @@ class ServiceController extends Controller
             // Eliminar el servicio
             $service->delete();
             return response()->json(['message' => 'Servicio eliminado'], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al eliminar el servicio',

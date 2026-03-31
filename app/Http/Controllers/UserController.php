@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Notifications\VerifyEmailNotification;
 use App\Service\servicios\validarService;
+use App\Service\UserService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -21,14 +22,16 @@ class UserController extends Controller
 {
 
     protected $validarService;
+    protected $userService;
 
-    public function __construct(validarService $validarService)
+    public function __construct(validarService $validarService, UserService $UserService)
     {
         $this->validarService = $validarService;
-       
+        $this->userService = $UserService;
+
     }
     public static $rules = [
-        'numero_cliente'   => 'required|string|max:6|unique:services,numero_cliente',
+        'numero_cliente'   => 'required|string|max:6',
         //'password'  => 'required|string|min:8',
     ];
 
@@ -51,14 +54,13 @@ class UserController extends Controller
     public function store(Request $request)
     {
         // Validar el cliente con el servicio
-        $validacion = clientService::validarClienteCompleto($request->numero_cliente);
+        $validacion = $this->validarService->validarClienteCompleto($request->numero_cliente);
 
         // Si la validación devuelve un error, retornar esa respuesta
         if ($validacion instanceof \Illuminate\Http\JsonResponse) {
             return $validacion;
         }
 
-        $clienteData = $validacion['clienteData']; // Extraer los datos del cliente validado
         $email = $validacion['email']; // Extraer el email del cliente validado
 
         $data = $request->validate(self::$rules); // Validar los datos de entrada 
@@ -67,36 +69,7 @@ class UserController extends Controller
         $numCliente = $data['numero_cliente'];
 
         try {
-            //$data['password'] = Hash::make($data['password']);
-            $passwordTemporal = Random::generate(8); 
-            $passwordTemporalhash = hash::make($passwordTemporal);             
-
-            // Transacción completa
-            $user = DB::transaction(function () use ($numCliente, $email, $passwordTemporal, $passwordTemporalhash) {
-
-                //guardar en tabla users email y password
-                $user = User::create([
-                    'email'    => $email,
-                    'password' => $passwordTemporalhash, //contraseña temporal
-                ]);
-                //guardar en tabla services numero de cliente
-                Service::create([
-                    'numero_cliente' => $numCliente,
-                    'user_id' => $user->id,
-                ]);
-
-                //Evento de registro 
-                //event(new Registered($user));
-                $user->notify(new VerifyEmailNotification($passwordTemporal));
-
-
-                return $user;
-            });
-
-            return response()->json([
-                'mensaje' => 'Registro creado correctamente',
-                'user'    => $user,
-            ], 201);
+            return $this->userService->existeCliente($numCliente, $email);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al crear la cuenta',
@@ -122,7 +95,6 @@ class UserController extends Controller
                 return response()->json(['message' => 'Servicio no encontrado o no pertenece al usuario'], 404);
             }
 
-            //$datosCliente = validarService::validarClienteApi($numero);
             $datosCliente = $this->validarService->validarClienteAPI($numero);
 
             if ($datosCliente instanceof \Illuminate\Http\JsonResponse) {
