@@ -37,7 +37,7 @@ class ServiceController extends Controller
         try {
             foreach ($servicios as $servicio) {
                 // Obtener datos del cliente usando el número de cliente encriptado
-                $clientesData[$servicio->id] = $this->validarService->obtenerCliente(
+                $clientesData[$servicio->id] = $this->validarService->validarClienteAPI(
                     (string) $servicio->numero_cliente
                 );
             }
@@ -71,7 +71,6 @@ class ServiceController extends Controller
 
         // Extraer datos validados
         $numeroCliente = $validacion['numero'];
-        //Log::info("Número de cliente validado: " . $numeroCliente);
         $email = $validacion['email'];
 
         // Crear dentro de transacción y asignar user_id (del usuario autenticado)

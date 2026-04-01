@@ -26,11 +26,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::post('auth/login', [authController::class, 'login']);
-// Route::apiResource('servicios', serviciosController::class)->only("index");
-
-// Route::get('/servicios', [ServiceController::class, 'index2']);
-
-
 
 route::middleware(['auth:sanctum'])->group(function (){
     Route::get('auth/logout', [authController::class, 'logout']);
@@ -64,11 +59,6 @@ Route::get('verify-access-service/{numero}', [ServiceController::class, 'verific
 Route::post('auth/recoverPassword', [RecoveryPasswordController::class,  'sendEmail']);
 Route::put('auth/updatePassword', [RecoveryPasswordController::class,  'updatePassword']);
 Route::post('/verify-token', [VerifyMailController::class, 'validarToken']);
-
-//rutas login y logout
-
-
-//Route::get('/ruta-con-log', function () {return 'Esta ruta registrará sus encabezados';})->middleware('logear.encabezados');
 
 
 //ruta formulario de correo

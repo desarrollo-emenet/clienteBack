@@ -28,7 +28,6 @@ class UserController extends Controller
     {
         $this->validarService = $validarService;
         $this->userService = $UserService;
-
     }
     public static $rules = [
         'numero_cliente'   => 'required|string|max:6',
@@ -36,7 +35,9 @@ class UserController extends Controller
     ];
 
     public static $rulesUpdate = [
-        'password'  => 'sometimes|string|min:8',
+        'old_password' => 'required|string',
+        'password'  => 'required|string|min:8',
+        
 
     ];
 
@@ -124,19 +125,19 @@ class UserController extends Controller
 
         try {
             // Validar datos
-            $validated = $request->validate(array_merge(self::$rulesUpdate, [
-                //'email' => ['sometimes', 'required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-            ]));
+            $validated = $request->validate((self::$rulesUpdate));
 
-            // Si se proporciona una nueva contraseña, encriptarla
-            if (!empty($validated['password'])) {
-                $validated['password'] = Hash::make($validated['password']);
-            } else { //sino eliminar el campo password para no actualizarlo a null
-                unset($validated['password']);
+            // Verificar la contraseña actual antes de permitir la actualización
+            $oldPassword = $validated['old_password'];
+            if (!Hash::check($oldPassword, $user->password)) {
+                return response()->json([
+                    'message' => 'Contraseña actual incorrecta',
+                ], 403);
             }
 
-            // Actualizar el usuario dentro de una transacción
-            DB::transaction(fn() => $user->update($validated));
+            //encriptar nueva contraseña temporal y actualizar el usuario
+            $user->password = Hash::make($validated['password']);
+            $user->save();
 
             // Devolver el usuario actualizado
             return response()->json([
@@ -145,7 +146,7 @@ class UserController extends Controller
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error al encontrar el usuario',
+                'message' => 'Error al actualizar la contraseña',
                 'error' => $e->getMessage()
             ], 404);
         }

@@ -14,12 +14,15 @@ class UserService
     // 
     public function existeCliente(string $numeroCliente, $email)
     {
+        //Validar si existe el numero de cliente
         $serviceExistente = Service::where('numero_cliente', $numeroCliente)->first();
 
+        //si existe, revisa si esta verificado el email sino reenvia correo
         if ($serviceExistente) {
             return $this->esVerificado($serviceExistente);
         }
 
+        //si no existe, crear cliente
         return $this->crearCliente($numeroCliente, $email);
     }
 
@@ -79,4 +82,9 @@ class UserService
             'user'    => $user,
         ], 201);
     }  
+
+    public function mantenerDatos(){
+        //fallback
+        //actualizacion de dato con TTL para mantener la sesion del cliente activa y evitar bloqueos por inactividad
+    }
 }
