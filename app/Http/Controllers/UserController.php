@@ -9,6 +9,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Notifications\VerifyEmailNotification;
+use App\Service\metadataService;
 use App\Service\servicios\validarService;
 use App\Service\UserService;
 use Illuminate\Support\Facades\Cache;
@@ -23,11 +24,13 @@ class UserController extends Controller
 
     protected $validarService;
     protected $userService;
+    protected $metadataService;
 
-    public function __construct(validarService $validarService, UserService $UserService)
+    public function __construct(validarService $validarService, UserService $UserService, metadataService $metadataService)
     {
         $this->validarService = $validarService;
         $this->userService = $UserService;
+        $this->metadataService = $metadataService;
     }
     public static $rules = [
         'numero_cliente'   => 'required|string|max:6',
@@ -96,7 +99,9 @@ class UserController extends Controller
                 return response()->json(['message' => 'Servicio no encontrado o no pertenece al usuario'], 404);
             }
 
-            $datosCliente = $this->validarService->validarClienteAPI($numero);
+            //$datosCliente = $this->validarService->validarClienteAPI($numero);   ------------------------------------
+            $datosCliente = $this->metadataService->getMetadataForCliente($numero, $user);
+
 
             if ($datosCliente instanceof \Illuminate\Http\JsonResponse) {
                 return $datosCliente; // Retornar error si hubo problema al obtener datos

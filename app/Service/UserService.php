@@ -5,6 +5,8 @@ namespace App\Service;
 use App\Models\Service;
 use App\Models\User;
 use App\Notifications\VerifyEmailNotification;
+use App\Service\servicios\validarService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Nette\Utils\Random;
@@ -81,10 +83,5 @@ class UserService
             'mensaje' => 'Registro creado correctamente',
             'user'    => $user,
         ], 201);
-    }  
-
-    public function mantenerDatos(){
-        //fallback
-        //actualizacion de dato con TTL para mantener la sesion del cliente activa y evitar bloqueos por inactividad
     }
 }

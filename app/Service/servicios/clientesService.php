@@ -6,6 +6,7 @@ use App\Mail\ServiceVerificationMail;
 use App\Models\Service;
 use App\Models\ServiceVerification;
 use App\Service\clientService;
+use App\Service\metadataService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -17,11 +18,14 @@ class clientesService
 {
     protected $validarService;
     protected $consultaApiService;
+    protected $metadataService;
 
-    public function __construct(validarService $validarService, consultaApiService $consultaApiService)
+    public function __construct(validarService $validarService, consultaApiService $consultaApiService, metadataService $metadataService)
     {
         $this->validarService = $validarService;
         $this->consultaApiService = $consultaApiService;
+        $this->metadataService = $metadataService;
+
     }
 
     public function index($request)
@@ -34,7 +38,8 @@ class clientesService
         $clientesData = [];
         foreach ($servicios as $servicio) {
             // Obtener datos del cliente usando el número de cliente encriptado
-            $cliente = consultaApiService::peticionAPI((string) $servicio->numero_cliente, 'false');
+            //$cliente = consultaApiService::peticionAPI((string) $servicio->numero_cliente, 'false');  -------------------------------
+            $cliente = $this->metadataService->getMetadataForCliente((string) $servicio->numero_cliente,$user);
             if ($cliente) {
                 $cliente['idServicio'] = $servicio->id;
                 $clientesData[] = $cliente;
@@ -109,8 +114,12 @@ class clientesService
             'message' => 'tu cuenta debe tener al menos un servicio'
         ], 409);
 
+        //eliminar metadata asociada al numero_cliente
+        $this->metadataService->eliminarMetadata($service->numero_cliente);
+
         // Eliminar el servicio
-        $service->delete();
+        $service->delete();        
+
         DB::commit();
         return response()->json(['message' => 'Servicio eliminado'], 200);
     }

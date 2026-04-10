@@ -84,5 +84,4 @@ class validarService
 
         return $email;
     }
-
 }

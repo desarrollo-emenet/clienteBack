@@ -17,4 +17,9 @@ class Service extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function metadata()
+{
+    return $this->hasOne(ClientMetadata::class, 'numero_cliente', 'numero_cliente');
+}
 }

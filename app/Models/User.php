@@ -25,12 +25,9 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array<int, string>
      */
     protected $fillable = [
-        //'cliente',
-        'name',
-        'last_name',
-        'phone',
         'email',
         'password',
+        'metadata',
     ];
 
     /**
@@ -50,6 +47,7 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'metadata' => 'array',
     ];
 
 
@@ -62,6 +60,11 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(ServiceVerification::class);
     }
+
+    public function clientMetadata()
+{
+    return $this->hasMany(ClientMetadata::class);
+}
 
 
 }
