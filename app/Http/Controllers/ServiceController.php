@@ -2,15 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\ServiceVerificationMail;
 use App\Models\Service;
-use App\Models\ServiceVerification;
-use App\Service\servicios\validarService;
-use App\Service\metadataService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 
 class ServiceController extends Controller
 {

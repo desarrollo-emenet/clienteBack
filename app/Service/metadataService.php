@@ -12,7 +12,7 @@ class metadataService
 
     protected $consultarApiService;
     protected $validarService;
-    const TTL_HOURS = 5;
+    const TTL_HOURS = 1;
 
     public function __construct(consultaApiService $consultaApiService, validarService $validarService)
     {
@@ -50,8 +50,8 @@ class metadataService
         if (!$clientMetadata->last_updated_at) return true;
 
         return $clientMetadata->last_updated_at
-            //->addHours(self::TTL_HOURS)
-            ->addMinutes(10) //prueba 
+            ->addHours(self::TTL_HOURS)
+            //->addMinutes(10) 
             ->isPast();
     }
 
