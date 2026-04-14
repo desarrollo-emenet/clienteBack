@@ -6,6 +6,7 @@ use App\Models\clientMetadata;
 use App\Models\User;
 use App\Service\servicios\consultaApiService;
 use App\Service\servicios\validarService;
+use Illuminate\Support\Facades\Cache;
 
 class metadataService
 {
@@ -18,11 +19,19 @@ class metadataService
     {
         $this->consultarApiService = $consultaApiService;
         $this->validarService = $validarService;
-
     }
 
     public function getMetadataForCliente(string $numeroCliente, User $user)
     {
+        //datos de cache
+        $cacheKey = $this->getCacheKey($user, $numeroCliente);
+
+        //buscar en cache
+        $cachedMetadata = cache()->get($cacheKey);
+        if ($cachedMetadata) {
+            return $cachedMetadata;
+        }
+
         //Buscar registro existente
         $clientMetadata = clientMetadata::where('user_id', $user->id)
             ->where('numero_cliente', $numeroCliente)
@@ -42,6 +51,7 @@ class metadataService
             }
         }
 
+        Cache::put($cacheKey, $clientMetadata->metadata, now()->addHours(self::TTL_HOURS));
         return $clientMetadata->metadata;
     }
 
@@ -51,19 +61,18 @@ class metadataService
 
         return $clientMetadata->last_updated_at
             ->addHours(self::TTL_HOURS)
-            //->addMinutes(10) 
             ->isPast();
     }
 
 
     public function refresh(User $user, string $numeroCliente)
     {
-        //$data = $this->validarService->validarClienteAPI($numeroCliente, false);   -----------------------------------------------------------
-         $data =  $this->consultarApiService->peticionAPI($numeroCliente, 'false'); 
+        $data =  $this->consultarApiService->peticionAPI($numeroCliente, 'false');
 
         if (!$data) {
             throw new \Exception('Error al consultar API');
         }
+
 
         $clientMetadata = clientMetadata::updateOrCreate(
             [
@@ -75,11 +84,21 @@ class metadataService
                 'last_updated_at' => now()
             ]
         );
+
+        $cacheKey = $this->getCacheKey($user, $numeroCliente);
+        Cache::put($cacheKey, $clientMetadata->metadata, now()->addHours(self::TTL_HOURS));
         return $clientMetadata->metadata;
     }
 
-    public function eliminarMetadata(string $numeroCliente)
+    private function getCacheKey(User $user, string $numeroCliente)
     {
-        clientMetadata::where('numero_cliente', $numeroCliente)->delete();
+        return "client_metadata_{$user->id}_{$numeroCliente}";
+    }
+
+    public function eliminarMetadata(User $user, string $numeroCliente)
+    {
+        $cacheKey = $this->getCacheKey($user, $numeroCliente);
+        Cache::forget($cacheKey);
+        clientMetadata::where('user_id', $user->id)->where('numero_cliente', $numeroCliente)->delete();
     }
 }
