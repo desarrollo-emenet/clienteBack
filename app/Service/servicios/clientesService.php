@@ -115,7 +115,7 @@ class clientesService
         ], 409);
 
         //eliminar metadata asociada al numero_cliente
-        $this->metadataService->eliminarMetadata($service->numero_cliente);
+        $this->metadataService->eliminarMetadata(Auth::user(),$service->numero_cliente);
 
         // Eliminar el servicio
         $service->delete();        
