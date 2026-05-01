@@ -2,20 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Service\clientService;
+
 
 use App\Models\Service;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Notifications\VerifyEmailNotification;
 use App\Service\metadataService;
 use App\Service\servicios\validarService;
 use App\Service\UserService;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
+
 use Illuminate\Support\Facades\Hash;
-use Nette\Utils\Random;
+
 
 //use Illuminate\Support\Facades\Log;
 
