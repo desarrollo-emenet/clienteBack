@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\User;
 
 
 
@@ -10,6 +10,8 @@ use App\Models\User;
 use App\Service\metadataService;
 use App\Service\servicios\validarService;
 use App\Service\UserService;
+use App\Http\Controllers\Controller;
+
 
 use Illuminate\Support\Facades\Hash;
 
@@ -79,7 +81,7 @@ class UserController extends Controller
         }
     }
 
-    public function clientePorNumero(Request $request, $numero)
+    public function clientePorNumero(Request $request, String $numero)
     {
         $user = $request->user();
         if (! $user) {

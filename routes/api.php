@@ -3,9 +3,10 @@
 use App\Http\Controllers\Auth\authController;
 use App\Http\Controllers\Auth\RecoveryPasswordController;
 use App\Http\Controllers\Auth\VerifyMailController;
-use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\servicios\ServiceController;
 use App\Http\Controllers\servicios\serviciosController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\User\PagoraliaController;
+use App\Http\Controllers\User\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +36,7 @@ route::middleware(['auth:sanctum'])->group(function (){
     //Route::post('servicio', [ServiceController::class, 'AddService']);
     Route::post('servicios/verificar', [serviciosController::class, 'confirmarServicio']);
     Route::get('verify-access-service/{numero}', [ServiceController::class, 'verificarAcceso']);
+    Route::post('/pagoralia/orden-pago', [PagoraliaController::class, 'crearOrdenPagoralia']);
 });
 
 

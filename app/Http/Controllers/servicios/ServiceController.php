@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\servicios;
 
+use App\Http\Controllers\Controller;
 use App\Models\Service;
 use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
 
-    public function verificarAcceso(Request $request, $numero)
+    public function verificarAcceso(Request $request, String $numero)
     {
         $user = $request->user();
 

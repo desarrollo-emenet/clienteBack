@@ -5,10 +5,10 @@ namespace App\Service\servicios;
 use App\Mail\ServiceVerificationMail;
 use App\Models\Service;
 use App\Models\ServiceVerification;
-use App\Service\clientService;
 use App\Service\metadataService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
@@ -28,7 +28,7 @@ class clientesService
 
     }
 
-    public function index($request)
+    public function index(Request $request)
     {
         // Obtener el usuario autenticado
         $user = $request->user();
@@ -51,7 +51,7 @@ class clientesService
         ], 200);
     }
 
-    public function store($request)
+    public function store(Request $request)
     {
         $validacion = $this->validarService->validarClienteCompleto($request->numero_cliente);
         if ($validacion instanceof JsonResponse) return $validacion; // Retornar error si hubo problema en validación
@@ -124,7 +124,7 @@ class clientesService
         return response()->json(['message' => 'Servicio eliminado'], 200);
     }
 
-    public function confirmarServicio($request)
+    public function confirmarServicio( Request $request)
     {
         $userId = $request->user()->id;
         //verificar que el codigo y numero_cliente coincidan con el registro de verificacion

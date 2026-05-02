@@ -3,14 +3,9 @@
 namespace App\Http\Controllers\servicios;
 
 use App\Http\Controllers\Controller;
-use App\Mail\ServiceVerificationMail;
-use App\Models\ServiceVerification;
-use App\Service\clientService;
 use App\Service\servicios\clientesService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Throwable;
 
 class serviciosController extends Controller
