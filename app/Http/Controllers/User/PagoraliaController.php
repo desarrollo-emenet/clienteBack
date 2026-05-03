@@ -23,10 +23,11 @@ class PagoraliaController extends Controller
     public function crearOrdenPagoralia(Request $request)
     {
         $request->validate([
-            'cliente_n' => 'required|string'
+            'numero_cliente' => 'required|string'
         ]);
-        $numero = $request->input('cliente_n');
-        Log::info('Numero de cliente recibido para pago: ' . $numero);
+
+        $numero = $request->input('numero_cliente');
+        //Log::info('Numero de cliente recibido para pago: ' . $numero);
 
         //obtener datos del cliente
         $datosCliente = $this->validarService->validarClienteAPI($numero);
@@ -36,7 +37,7 @@ class PagoraliaController extends Controller
         }
 
         $clienteData = $datosCliente;
-        Log::info('Datos del cliente obtenidos para pago: ', $clienteData);
+        //Log::info('Datos del cliente obtenidos para pago: ', $clienteData);
 
         //construir invoice
         $invoice = InvoiceService::construirInvoiceDesdeBilling($clienteData['cliente']['cliente']);
@@ -56,9 +57,6 @@ class PagoraliaController extends Controller
 
         $peticion = ApiPagoraliaService::peticionAPIPagoralia($data);
 
-        Log::info('Pagoralia Request', $data);
-        Log::info('Pagoralia Response', $peticion);
-
         //validar peticion
         $redirectUrl = $peticion['data']['redirect_url'] ?? null;
 
@@ -67,7 +65,7 @@ class PagoraliaController extends Controller
                 'success' => false,
                 'message' => 'Error al crear la orden en Pagoralia'
             ], 500);
-        }  
+        }
 
         return response()->json([
             'status' => true,
