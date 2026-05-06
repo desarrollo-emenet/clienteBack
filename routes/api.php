@@ -37,7 +37,9 @@ route::middleware(['auth:sanctum'])->group(function (){
     Route::post('servicios/verificar', [serviciosController::class, 'confirmarServicio']);
     Route::get('verify-access-service/{numero}', [ServiceController::class, 'verificarAcceso']);
     Route::post('/pagoralia/orden-pago', [PagoraliaController::class, 'crearOrdenPagoralia']);
+    //Route::post('/pagoralia/invoice', [PagoraliaController::class, 'desencriptarInvoice']);
 });
+    Route::post('/pagoralia/invoice', [PagoraliaController::class, 'desencriptarInvoice']);
 
 
 //Controlador de verificacion

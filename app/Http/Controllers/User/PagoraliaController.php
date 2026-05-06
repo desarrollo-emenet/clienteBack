@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Service\Invoice\ApiPagoraliaService;
+use App\Service\Invoice\desencriptarInvoiceService;
 use App\Service\Invoice\InvoiceService;
 use App\Service\servicios\validarService;
 use Illuminate\Http\Request;
@@ -72,5 +73,27 @@ class PagoraliaController extends Controller
             'message' => 'Orden creada exitosamente en Pagoralia',
             'redirectUrl' => $redirectUrl
         ]);
+    }
+
+    public function desencriptarInvoice(Request $request)
+    {
+        $request->validate([
+            'invoice' => 'required|string'
+        ]);
+
+        $invoiceRaw = $request->input('invoice');
+
+        try {
+            $resultado = desencriptarInvoiceService::desencriptarInvoice($invoiceRaw);
+            return response()->json([
+                'success' => true,
+                'data' => $resultado
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
     }
 }
