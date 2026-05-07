@@ -28,7 +28,7 @@ class PagoraliaController extends Controller
         ]);
 
         $numero = $request->input('numero_cliente');
-        //Log::info('Numero de cliente recibido para pago: ' . $numero);
+        Log::info('Numero de cliente recibido para pago: ' . $numero);
 
         //obtener datos del cliente
         $datosCliente = $this->validarService->validarClienteAPI($numero);
@@ -38,7 +38,7 @@ class PagoraliaController extends Controller
         }
 
         $clienteData = $datosCliente;
-        //Log::info('Datos del cliente obtenidos para pago: ', $clienteData);
+        Log::info('Datos del cliente obtenidos para pago: ', $clienteData);
 
         //construir invoice
         $invoice = InvoiceService::construirInvoiceDesdeBilling($clienteData['cliente']['cliente']);
@@ -60,6 +60,8 @@ class PagoraliaController extends Controller
 
         //validar peticion
         $redirectUrl = $peticion['data']['redirect_url'] ?? null;
+        Log::info('Respuesta de Pagoralia: ', $peticion);
+        Log::info('URL de redirección obtenida de Pagoralia: ' . $redirectUrl);
 
         if (!$peticion || !$redirectUrl) {
             return response()->json([
