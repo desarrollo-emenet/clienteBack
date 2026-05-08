@@ -18,8 +18,7 @@ class LogearEncabezados
      */
     public function handle(Request $request, Closure $next)
     {
-        Log::info('Encabezados de la solicitud:', $request->headers->all());
-
+        //Log::info('Encabezados de la solicitud:', $request->headers->all());
         return $next($request);
     }
 }

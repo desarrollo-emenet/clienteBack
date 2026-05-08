@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Invoice;
+namespace App\Service\Pagos;
 
 use Cron\MonthField;
 use DateTime;
@@ -142,17 +142,10 @@ class InvoiceService
             ];
         }
 
-        if ($total === 3) { // 3  → 1 nombre + 2 apellidos
-            return [
-                'nombre' => $partes[0],
-                'apellido' => $partes[1] . ' ' . $partes[2]
-            ];
-        }
-
-        // 4 o más → 2 nombres + resto apellidos
+        // Tomar los últimos dos como apellido
         return [
-            'nombre' => $partes[0] . ' ' . $partes[1],
-            'apellido' => implode(' ', array_slice($partes, 2))
+            'nombre' => implode(' ', array_slice($partes, 0, -2)), 
+            'apellido' => implode(' ', array_slice($partes, -2))
         ];
     }
 }

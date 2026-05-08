@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Invoice;
+namespace App\Service\Pagos;
 
 use Psy\Readline\Hoa\Console;
 

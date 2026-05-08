@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use App\Service\Invoice\ApiPagoraliaService;
-use App\Service\Invoice\desencriptarInvoiceService;
-use App\Service\Invoice\InvoiceService;
+use App\Service\Pagos\desencriptarInvoiceService;
+use App\Service\Pagos\pagosService;
 use App\Service\servicios\validarService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -14,10 +13,12 @@ class PagoraliaController extends Controller
 {
 
     protected $validarService;
+    protected $pagosService;
 
-    public function __construct(validarService $validarService)
+    public function __construct(validarService $validarService, pagosService $pagosService)
     {
         $this->validarService = $validarService;
+        $this->pagosService = $pagosService;
     }
 
     //
@@ -28,53 +29,38 @@ class PagoraliaController extends Controller
         ]);
 
         $numero = $request->input('numero_cliente');
-        Log::info('Numero de cliente recibido para pago: ' . $numero);
 
-        //obtener datos del cliente
-        $datosCliente = $this->validarService->validarClienteAPI($numero);
+        try {
+            //obtener datos del cliente
+            $datosCliente = $this->validarService->validarClienteAPI($numero);
+            if ($datosCliente instanceof \Illuminate\Http\JsonResponse) {
+                return $datosCliente;
+            }
 
-        if ($datosCliente instanceof \Illuminate\Http\JsonResponse) {
-            return $datosCliente;
-        }
+            $clienteData = $datosCliente;
 
-        $clienteData = $datosCliente;
-        Log::info('Datos del cliente obtenidos para pago: ', $clienteData);
+            //$monto = $clienteData['cliente']['deuda'];
 
-        //construir invoice
-        $invoice = InvoiceService::construirInvoiceDesdeBilling($clienteData['cliente']['cliente']);
+            //si el cliente tiene deuda, se toma esa cantidad, sino se calcula el total mensual * 1 para adelantarse al pago del mes
+            if ($clienteData['cliente']['deuda'] > 0) {
+                $monto = floatval($clienteData['cliente']['deuda']);
+            } else {
+                $totalmensual = $this->pagosService->calcularTotalMensual($clienteData['servicios']);
+                $monto = ($totalmensual) * 1;
+            }
 
-        //separar nombre y apellido
-        $nombreApellido = InvoiceService::separarNombreApellido($clienteData['cliente']['nombre']);
+            //construir la info para pagoralia
+            $data = $this->pagosService->construirDataPago($clienteData, $monto);
 
-        $data = [
-            'isUnique' => 1,
-            'invoice' => $invoice,
-            'cliente' => $clienteData['cliente']['cliente'],
-            'nombre' => $nombreApellido['nombre'],
-            'apellido' => $nombreApellido['apellido'],
-            'monto' => InvoiceService::formatearMontoPagoralia($clienteData['cliente']['deuda']),
-            'moneda' => 'MXN'
-        ];
-
-        $peticion = ApiPagoraliaService::peticionAPIPagoralia($data);
-
-        //validar peticion
-        $redirectUrl = $peticion['data']['redirect_url'] ?? null;
-        Log::info('Respuesta de Pagoralia: ', $peticion);
-        Log::info('URL de redirección obtenida de Pagoralia: ' . $redirectUrl);
-
-        if (!$peticion || !$redirectUrl) {
+            //genera la orden en pagoralia y obtiene la url de redireccionamiento
+            return $this->pagosService->generarOrdenPagoralia($data);
+        } catch (\Exception $e) {
+            Log::error('Error en crearOrdenPagoralia: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Error al crear la orden en Pagoralia'
+                'message' => 'Ocurrió un error al crear la orden de pago'
             ], 500);
         }
-
-        return response()->json([
-            'status' => true,
-            'message' => 'Orden creada exitosamente en Pagoralia',
-            'redirectUrl' => $redirectUrl
-        ]);
     }
 
     public function desencriptarInvoice(Request $request)

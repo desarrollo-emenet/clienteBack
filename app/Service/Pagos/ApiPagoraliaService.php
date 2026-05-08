@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Invoice;
+namespace App\Service\Pagos;
 
 use Illuminate\Support\Facades\Http;
 
