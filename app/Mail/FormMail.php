@@ -34,7 +34,7 @@ class FormMail extends Mailable
     {
         //
         return new Envelope(
-            replyTo: [$this->data['correo']],
+            
             subject: 'Nuevo mensaje de contacto - ' . $this->data['nombre'],
         );
     }

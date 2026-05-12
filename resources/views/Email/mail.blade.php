@@ -4,14 +4,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width">
-  <title>Nuevo mensaje de contacto</title>
+  <title>Nuevo pago recibido</title>
 </head>
 
-<body
-  style="margin:0; padding:0; background-color:#f2f4f7; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;">
+<body style="margin:0; padding:0; background-color:#f2f4f7; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;">
 
-  <table width="100%" cellpadding="0" cellspacing="0" role="presentation"
-    style="background:#f2f4f7; padding:28px 12px;">
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f2f4f7; padding:28px 12px;">
     <tr>
       <td align="center">
 
@@ -21,68 +19,98 @@
           <!-- HEADER -->
           <tr>
             <td style="padding:28px 32px 10px 32px;" align="center">
-              <img src="{{ $message->embed(public_path('img/emenetLogo.png')) }}" alt="EMENET Comunicaciones"
-                width="150" style="display:block; border:0; max-width:200px; height:auto;">
+              <img src="{{ $message->embed(public_path('img/emenetLogo.png')) }}"
+                alt="EMENET Comunicaciones" width="150"
+                style="display:block; border:0; max-width:200px; height:auto;">
             </td>
           </tr>
 
-          
+          <!-- TITULO -->
           <tr>
             <td style="padding:0 32px 10px 32px;">
               <h2 style="margin:0; font-size:20px; color:#0b2236; font-weight:700;">
-                Nuevo mensaje recibido desde el sitio web
+                Nuevo pago recibido
               </h2>
             </td>
           </tr>
 
-          
+          <!-- DESCRIPCIÓN -->
           <tr>
             <td style="padding:0 32px 24px 32px; font-size:14px; color:#4b5563; line-height:1.6;">
-              Se ha generado una nueva solicitud de contacto a través del formulario web de
-              <strong>EMENET Comunicaciones</strong>.
+              Se ha recibido un nuevo pago desde el sistema de <strong>EMENET Comunicaciones</strong>.
               <br><br>
-              A continuación se detallan los datos proporcionados por el usuario:
+              A continuación se muestran los detalles del pago:
             </td>
           </tr>
 
-          
+          <!-- DATOS -->
           <tr>
             <td style="padding:0 32px 28px 32px;">
 
-              <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
 
                 <tr>
                   <td style="padding:12px 0; border-bottom:1px solid #eef1f5;">
-                    <span style="font-size:12px; color:#6b7280; font-weight:600;">Nombre del contacto</span><br>
+                    <span style="font-size:12px; color:#6b7280;">Cliente</span><br>
+                    <span style="font-size:14px; color:#111827;">{{ $data['cliente'] }}</span>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:12px 0; border-bottom:1px solid #eef1f5;">
+                    <span style="font-size:12px; color:#6b7280;">Usuario</span><br>
                     <span style="font-size:14px; color:#111827;">{{ $data['nombre'] }}</span>
                   </td>
                 </tr>
 
                 <tr>
                   <td style="padding:12px 0; border-bottom:1px solid #eef1f5;">
-                    <span style="font-size:12px; color:#6b7280; font-weight:600;">Teléfono</span><br>
+                    <span style="font-size:12px; color:#6b7280;">Fecha de pago</span><br>
+                    <span style="font-size:14px; color:#111827;">{{ $data['fechaPago'] }}</span>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:12px 0; border-bottom:1px solid #eef1f5;">
+                    <span style="font-size:12px; color:#6b7280;">Número de operación</span><br>
+                    <span style="font-size:14px; color:#111827;">{{ $data['numOperacion'] }}</span>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:12px 0; border-bottom:1px solid #eef1f5;">
+                    <span style="font-size:12px; color:#6b7280;">Teléfono</span><br>
                     <span style="font-size:14px; color:#111827;">{{ $data['telefono'] }}</span>
                   </td>
                 </tr>
 
                 <tr>
                   <td style="padding:12px 0; border-bottom:1px solid #eef1f5;">
-                    <span style="font-size:12px; color:#6b7280; font-weight:600;">Correo electrónico</span><br>
-                    <span style="font-size:14px; color:#111827;">
-                      <a href="mailto:{{ $data['correo'] }}" style="color:#0b6efd; text-decoration:none;">
-                        {{ $data['correo'] }}
-                      </a>
-                    </span>
+                    <span style="font-size:12px; color:#6b7280;">Clave</span><br>
+                    <span style="font-size:14px; color:#111827;">{{ $data['clave'] }}</span>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:12px 0; border-bottom:1px solid #eef1f5;">
+                    <span style="font-size:12px; color:#6b7280;">Mensualidad</span><br>
+                    <span style="font-size:14px; color:#111827;">{{ $data['mensualidad'] }}</span>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:12px 0; border-bottom:1px solid #eef1f5;">
+                    <span style="font-size:12px; color:#6b7280;">Monto</span><br>
+                    <span style="font-size:14px; color:#111827;">${{ $data['monto'] }}</span>
                   </td>
                 </tr>
 
                 <tr>
                   <td style="padding:16px 0 0 0;">
-                    <span style="font-size:12px; color:#6b7280; font-weight:600;">Mensaje enviado</span>
-                    <div
-                      style="margin-top:8px; background:#f9fafb; padding:14px; border-radius:6px; font-size:14px; color:#1f2937; line-height:1.6; white-space:pre-line;">
-                      {{ $data['mensaje'] }}
-                    </div>
+                    <span style="font-size:12px; color:#6b7280;">Comprobante</span><br>
+                    <span style="font-size:14px; color:#111827;">
+                      Archivo recibido (revisar en sistema)
+                    </span>
                   </td>
                 </tr>
 
@@ -91,11 +119,10 @@
             </td>
           </tr>
 
-          
+          <!-- FOOTER -->
           <tr>
             <td style="padding:0 32px 28px 32px; font-size:14px; color:#4b5563; line-height:1.6;">
-              Se recomienda dar seguimiento oportuno a esta solicitud para mantener la calidad en la atención al
-              cliente.
+              Favor de validar el pago en el sistema y dar seguimiento correspondiente.
             </td>
           </tr>
 
