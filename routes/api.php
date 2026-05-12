@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\authController;
 use App\Http\Controllers\Auth\RecoveryPasswordController;
 use App\Http\Controllers\Auth\VerifyMailController;
+use App\Http\Controllers\FormPagoController;
 use App\Http\Controllers\servicios\ServiceController;
 use App\Http\Controllers\servicios\serviciosController;
 use App\Http\Controllers\User\PagoraliaController;
@@ -66,5 +67,5 @@ Route::put('auth/updatePassword', [RecoveryPasswordController::class,  'updatePa
 Route::post('/verify-token', [VerifyMailController::class, 'validarToken']);
 
 
-//ruta formulario de correo
-//Route::post('/send-email', [FormController::class, 'send']);
+//formulario de pago
+Route::post('/pagos', [FormPagoController::class, 'send']);
