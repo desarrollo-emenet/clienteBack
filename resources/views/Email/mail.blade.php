@@ -51,15 +51,8 @@
 
                 <tr>
                   <td style="padding:12px 0; border-bottom:1px solid #eef1f5;">
-                    <span style="font-size:12px; color:#6b7280;">Cliente</span><br>
-                    <span style="font-size:14px; color:#111827;">{{ $data['cliente'] }}</span>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="padding:12px 0; border-bottom:1px solid #eef1f5;">
-                    <span style="font-size:12px; color:#6b7280;">Usuario</span><br>
-                    <span style="font-size:14px; color:#111827;">{{ $data['nombre'] }}</span>
+                    <span style="font-size:12px; color:#6b7280;">Feorma de pago</span><br>
+                    <span style="font-size:14px; color:#111827;">{{ $data['formaPago'] }}</span>
                   </td>
                 </tr>
 
@@ -93,13 +86,6 @@
 
                 <tr>
                   <td style="padding:12px 0; border-bottom:1px solid #eef1f5;">
-                    <span style="font-size:12px; color:#6b7280;">Mensualidad</span><br>
-                    <span style="font-size:14px; color:#111827;">{{ $data['mensualidad'] }}</span>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td style="padding:12px 0; border-bottom:1px solid #eef1f5;">
                     <span style="font-size:12px; color:#6b7280;">Monto</span><br>
                     <span style="font-size:14px; color:#111827;">${{ $data['monto'] }}</span>
                   </td>
@@ -109,7 +95,7 @@
                   <td style="padding:16px 0 0 0;">
                     <span style="font-size:12px; color:#6b7280;">Comprobante</span><br>
                     <span style="font-size:14px; color:#111827;">
-                      Archivo recibido (revisar en sistema)
+                      <img src="{{ $message->embed($data['comprobante']) }}" alt="imagen"style="max-width: 100%; height: auto;">
                     </span>
                   </td>
                 </tr>
@@ -117,14 +103,7 @@
               </table>
 
             </td>
-          </tr>
-
-          <!-- FOOTER -->
-          <tr>
-            <td style="padding:0 32px 28px 32px; font-size:14px; color:#4b5563; line-height:1.6;">
-              Favor de validar el pago en el sistema y dar seguimiento correspondiente.
-            </td>
-          </tr>
+          </tr>          
 
         </table>
 
