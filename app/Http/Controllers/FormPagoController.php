@@ -37,14 +37,23 @@ class FormPagoController extends Controller
         // enviar info al endpoint
         try {
 
-            Log::info('Enviando informacion con los siguientes datos: ', $request->all());
+            //Log::info('Enviando informacion con los siguientes datos: ', $request->all());
+
+            Log::info('Datos validados', $validator->validated());
+
+            Log::info('Archivo recibido', [
+                'nombre' => $request->file('comprobante')->getClientOriginalName(),
+                'mime'   => $request->file('comprobante')->getMimeType(),
+                'size'   => $request->file('comprobante')->getSize(),
+            ]);
 
             //enviar datos a la api de pagos
-            $response = ApiPagosService::peticionAPIPagos($validator->validated());
+            $response = ApiPagosService::peticionAPIPagos($request, $validator->validated());
 
 
             return response()->json([
                 'success' => true,
+                'response' => $response,
                 'message' => 'informacion enviada correctamente.'
             ], 200);
         } catch (\Exception $e) {
