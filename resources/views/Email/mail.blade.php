@@ -7,9 +7,11 @@
   <title>Nuevo pago recibido</title>
 </head>
 
-<body style="margin:0; padding:0; background-color:#f2f4f7; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;">
+<body
+  style="margin:0; padding:0; background-color:#f2f4f7; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;">
 
-  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:#f2f4f7; padding:28px 12px;">
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation"
+    style="background:#f2f4f7; padding:28px 12px;">
     <tr>
       <td align="center">
 
@@ -19,9 +21,8 @@
           <!-- HEADER -->
           <tr>
             <td style="padding:28px 32px 10px 32px;" align="center">
-              <img src="{{ $message->embed(public_path('img/emenetLogo.png')) }}"
-                alt="EMENET Comunicaciones" width="150"
-                style="display:block; border:0; max-width:200px; height:auto;">
+              <img src="{{ $message->embed(public_path('img/emenetLogo.png')) }}" alt="EMENET Comunicaciones"
+                width="150" style="display:block; border:0; max-width:200px; height:auto;">
             </td>
           </tr>
 
@@ -51,8 +52,22 @@
 
                 <tr>
                   <td style="padding:12px 0; border-bottom:1px solid #eef1f5;">
-                    <span style="font-size:12px; color:#6b7280;">Feorma de pago</span><br>
-                    <span style="font-size:14px; color:#111827;">{{ $data['formaPago'] }}</span>
+                    <span style="font-size:12px; color:#6b7280;">Cliente</span><br>
+                    <span style="font-size:14px; color:#111827;">{{ $data['cliente'] }}</span>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:12px 0; border-bottom:1px solid #eef1f5;">
+                    <span style="font-size:12px; color:#6b7280;">Teléfono</span><br>
+                    <span style="font-size:14px; color:#111827;">{{ $data['telefono'] }}</span>
+                  </td>
+                </tr>
+                
+                <tr>
+                  <td style="padding:12px 0; border-bottom:1px solid #eef1f5;">
+                    <span style="font-size:12px; color:#6b7280;">Clave</span><br>
+                    <span style="font-size:14px; color:#111827;">{{ $data['clave'] }}</span>
                   </td>
                 </tr>
 
@@ -70,19 +85,7 @@
                   </td>
                 </tr>
 
-                <tr>
-                  <td style="padding:12px 0; border-bottom:1px solid #eef1f5;">
-                    <span style="font-size:12px; color:#6b7280;">Teléfono</span><br>
-                    <span style="font-size:14px; color:#111827;">{{ $data['telefono'] }}</span>
-                  </td>
-                </tr>
 
-                <tr>
-                  <td style="padding:12px 0; border-bottom:1px solid #eef1f5;">
-                    <span style="font-size:12px; color:#6b7280;">Clave</span><br>
-                    <span style="font-size:14px; color:#111827;">{{ $data['clave'] }}</span>
-                  </td>
-                </tr>
 
                 <tr>
                   <td style="padding:12px 0; border-bottom:1px solid #eef1f5;">
@@ -95,7 +98,8 @@
                   <td style="padding:16px 0 0 0;">
                     <span style="font-size:12px; color:#6b7280;">Comprobante</span><br>
                     <span style="font-size:14px; color:#111827;">
-                      <img src="{{ $message->embed($data['comprobante']) }}" alt="imagen"style="max-width: 100%; height: auto;">
+                      <img src="{{ $message->embed($data['comprobante']) }}" alt="imagen"
+                        style="max-width: 100%; height: auto;">
                     </span>
                   </td>
                 </tr>
@@ -103,7 +107,7 @@
               </table>
 
             </td>
-          </tr>          
+          </tr>
 
         </table>
 

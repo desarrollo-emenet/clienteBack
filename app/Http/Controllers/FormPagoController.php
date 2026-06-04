@@ -16,16 +16,13 @@ class FormPagoController extends Controller
     {
         //campos que tendra el formulario, validacion de los mismos
         $validator = Validator::make($request->all(), [
-            //'cliente'   => 'required|string|max:10',
-            //'nombre' => 'required|string|max:100',
-            'formaPago' => 'required|string',
+            'cliente'   => 'required|string|max:10',
             'fechaPago'   => 'required|date',
             'numOperacion'  => 'required|string|max:100',
-            'telefono' => 'required|string|max:20',
-            'clave' => 'required|string|max:100',
-            'comprobante' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
-            //'mensualidad' => 'required|string|max:20',
-            'monto' => 'required|string|max:20',
+            'telefono' => 'required|string|max:10',
+            'clave' => 'required|string|max:3', //TRH o DBH
+            'comprobante' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'monto' => 'required|numeric',
         ]);
 
         //si la validacion falla, se regresa un error con los mensajes de validacion
