@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\FormMail;
+use App\Service\Pagos\ApiPagosService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
@@ -38,11 +39,9 @@ class FormPagoController extends Controller
 
             Log::info('Enviando informacion con los siguientes datos: ', $request->all());
 
-            //enviar informacion del formualario a la api con post
-            Mail::to(config('mail.to_address'))->send(
-                new FormMail($validator->validated())
-            );
-            
+            //enviar datos a la api de pagos
+            $response = ApiPagosService::peticionAPIPagos($validator->validated());
+
 
             return response()->json([
                 'success' => true,
