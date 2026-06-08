@@ -34,7 +34,8 @@ class ApiPagosService
             ->attach(
                 'comprobante',
                 file_get_contents($request->file('comprobante')->getRealPath()),
-                $request->file('comprobante')->getClientOriginalName()
+                $request->file('comprobante')->getClientOriginalName(),
+                ['Content-Type' => $request->file('comprobante')->getMimeType()] //detectar tipo de dato
             )
             ->post($web_url, $data);
 

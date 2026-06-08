@@ -37,7 +37,7 @@ class FormPagoController extends Controller
         // enviar info al endpoint
         try {
 
-            //Log::info('Enviando informacion con los siguientes datos: ', $request->all());
+            Log::info('Enviando datos: ', $request->all());
 
             Log::info('Datos validados', $validator->validated());
 
