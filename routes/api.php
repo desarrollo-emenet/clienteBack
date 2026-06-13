@@ -38,7 +38,6 @@ route::middleware(['auth:sanctum'])->group(function (){
     Route::post('servicios/verificar', [serviciosController::class, 'confirmarServicio']);
     Route::get('verify-access-service/{numero}', [ServiceController::class, 'verificarAcceso']);
     Route::post('/pagoralia/orden-pago', [PagoraliaController::class, 'crearOrdenPagoralia']);
-    //Route::post('/pagoralia/invoice', [PagoraliaController::class, 'desencriptarInvoice']);
 });
     Route::post('/pagoralia/invoice', [PagoraliaController::class, 'desencriptarInvoice']);
 
@@ -59,13 +58,8 @@ Route::apiResource('usuarios',UserController::class);
 Route::middleware('auth:sanctum')->get('cliente/{numero}', [UserController::class, 'clientePorNumero']);
 
 
-
-
 //rutas de recuperacion de contraseña
 Route::post('auth/recoverPassword', [RecoveryPasswordController::class,  'sendEmail']);
 Route::put('auth/updatePassword', [RecoveryPasswordController::class,  'updatePassword']);
 Route::post('/verify-token', [VerifyMailController::class, 'validarToken']);
 
-
-//formulario de pago
-Route::post('/pagos', [FormPagoController::class, 'send']);
