@@ -2,17 +2,21 @@
 
 namespace App\Service\Pagos;
 
-class pagosService{
-        public function construirDataPago(array $clienteData, float $monto)
+class pagosService
+{
+
+    public function construirDataPago(array $clienteData, float $monto)
     {
+        // Construir el invoice con los datos del cliente
         $invoice = InvoiceService::construirInvoiceDesdeBilling(
             $clienteData['cliente']['cliente']
         );
-
+        // Separar el nombre completo en nombre y apellido
         $nombreApellido = InvoiceService::separarNombreApellido(
             $clienteData['cliente']['nombre']
         );
 
+        // Devolver la información necesaria para crear la orden de pago
         return [
             'isUnique' => 1,
             'invoice' => $invoice,
@@ -26,10 +30,13 @@ class pagosService{
 
     public function generarOrdenPagoralia(array $data)
     {
+        // Realizar la petición a Pagoralia
         $peticion = ApiPagoraliaService::peticionAPIPagoralia($data);
 
+        // Verificar la respuesta de Pagoralia
         $redirectUrl = $peticion['data']['redirect_url'] ?? null;
 
+        // Si no se obtuvo una URL de redireccionamiento, retornar un error
         if (!$peticion || !$redirectUrl) {
             return response()->json([
                 'success' => false,

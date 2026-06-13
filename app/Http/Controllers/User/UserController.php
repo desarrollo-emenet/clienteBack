@@ -14,7 +14,7 @@ use App\Http\Controllers\Controller;
 
 
 use Illuminate\Support\Facades\Hash;
-
+use Illuminate\Support\Facades\Log;
 
 //use Illuminate\Support\Facades\Log;
 
@@ -61,6 +61,7 @@ class UserController extends Controller
 
         // Si la validación devuelve un error, retornar esa respuesta
         if ($validacion instanceof \Illuminate\Http\JsonResponse) {
+            Log::error('Error al validar cliente: ' . $validacion->getContent());
             return $validacion;
         }
 
@@ -103,6 +104,7 @@ class UserController extends Controller
 
 
             if ($datosCliente instanceof \Illuminate\Http\JsonResponse) {
+                Log::error('Error al obtener datos del cliente: ' . $datosCliente->getContent());
                 return $datosCliente; // Retornar error si hubo problema al obtener datos
             }
 

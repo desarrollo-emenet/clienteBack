@@ -55,6 +55,7 @@ class metadataService
         return $clientMetadata->metadata;
     }
 
+    // Verificar si el metadata ha expirado 1 hora
     private function isExpired(clientMetadata $clientMetadata)
     {
         if (!$clientMetadata->last_updated_at) return true;
@@ -65,6 +66,7 @@ class metadataService
     }
 
 
+    //actualizar metadata sino la crea
     public function refresh(User $user, string $numeroCliente)
     {
         $data =  $this->consultarApiService->peticionAPI($numeroCliente, 'false');
@@ -85,16 +87,20 @@ class metadataService
             ]
         );
 
+        
         $cacheKey = $this->getCacheKey($user, $numeroCliente);
+        // Guardar en cache
         Cache::put($cacheKey, $clientMetadata->metadata, now()->addHours(self::TTL_HOURS));
         return $clientMetadata->metadata;
     }
 
+    //obtener metadata de la cache
     private function getCacheKey(User $user, string $numeroCliente)
     {
         return "client_metadata_{$user->id}_{$numeroCliente}";
     }
 
+    //eliminar metadata de cache y base de datos
     public function eliminarMetadata(User $user, string $numeroCliente)
     {
         $cacheKey = $this->getCacheKey($user, $numeroCliente);

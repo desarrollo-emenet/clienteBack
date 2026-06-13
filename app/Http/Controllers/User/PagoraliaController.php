@@ -34,6 +34,7 @@ class PagoraliaController extends Controller
             //obtener datos del cliente
             $datosCliente = $this->validarService->validarClienteAPI($numero);
             if ($datosCliente instanceof \Illuminate\Http\JsonResponse) {
+                Log::error('Error al validar cliente: ' . $datosCliente->getContent());
                 return $datosCliente;
             }
 
