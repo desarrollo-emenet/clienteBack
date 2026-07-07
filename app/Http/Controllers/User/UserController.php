@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\User;
 
-
-
 use App\Models\Service;
 use Illuminate\Http\Request;
 use App\Models\User;
@@ -11,8 +9,6 @@ use App\Service\metadataService;
 use App\Service\servicios\validarService;
 use App\Service\UserService;
 use App\Http\Controllers\Controller;
-
-
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
@@ -50,7 +46,6 @@ class UserController extends Controller
         ], 200);
     }
 
-
     //Crear cuenta
     public function store(Request $request)
     {
@@ -65,11 +60,11 @@ class UserController extends Controller
 
         $email = $validacion['email']; // Extraer el email del cliente validado
 
-        $correoExistente = $this->validarService->validarCorreoDisponible($email);
+        /*$correoExistente = $this->validarService->validarCorreoDisponible($email);
         if ($correoExistente instanceof \Illuminate\Http\JsonResponse) {
             Log::error('Error al validar correo: ' . $correoExistente->getContent());
             return $correoExistente;
-        }
+        }*/
 
         //log::info('correoExistente', ['data' => $correoExistente]);
         log::info('email', ['data' => $email]);
@@ -131,7 +126,7 @@ class UserController extends Controller
         }
     }
 
-
+//actualizar contraseña
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);

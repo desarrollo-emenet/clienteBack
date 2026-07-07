@@ -31,10 +31,8 @@ class UserService
     {
         // Buscar si ya existe el número de cliente
         $user = User::find($serviceExistente->user_id);
-
-        // Si NO ha verificado correo
+        // Si no ha verificado el correo
         if (is_null($user->email_verified_at)) {
-
             // Generar nueva contraseña temporal
             $passwordTemporal = Random::generate(8);
 
