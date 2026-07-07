@@ -3,6 +3,7 @@
 namespace App\Service\servicios;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class validarService
@@ -17,18 +18,14 @@ class validarService
 
     public function validarClienteCompleto(string $numeroCliente)
     {
-        //Descodificar número
-        /*$numeroCliente = codificacionService::descodificarClienteConLetra($numEncriptado);
-        if ($numeroCliente instanceof JsonResponse) {
-            return $numeroCliente; // Error en descodificación
-        }*/
-
         // Validar con API
         $clienteData = $this->validarClienteAPI($numeroCliente, true);
+        //Log::info('clienteData', ['data' => $clienteData]);
         if ($clienteData instanceof JsonResponse) return $clienteData; // Error en API
 
 
         $clienteEmail = $this->obtenerEmail($clienteData);
+        //Log::info('clienteEmail', ['email' => $clienteEmail]);
         if ($clienteEmail instanceof JsonResponse) return $clienteEmail; // Error al obtener email
 
         // retornar datos
@@ -55,33 +52,34 @@ class validarService
         if ($clasificacion == 'BAJA') return response()->json([
             'success' => "error",
             'message' => 'Este servicio está dado de baja y no puede registrarse'
-        ], 422);
+        ], 404);
 
         return $clienteData;
     }
 
-    public static function obtenerEmail(array $clienteData): ?string
+    public static function obtenerEmail(array $clienteData): string|JsonResponse
     {
         // Extraer el email del clienteData
         //$email = $clienteData['cliente']['email'] ?? null;
 
-        $email = "crismart12ne@gmail.com"; // Email fijo para pruebas
+        $email = "mcid653@gmail.com"; // Email fijo para pruebas
+        //$email = "";
 
         if (!filter_var(trim($email), FILTER_VALIDATE_EMAIL)) return response()->json([
             'success' => "error",
             'message' => 'El correo del cliente no es valido o no esta registrado.'
         ], 422);
 
-        /*$userExistente = User::where('email', $email)->exists();
-
-        // Si el email ya existe, retornar un error
-        if ($userExistente) {
-            return response()->json([
-                'message' => 'Este correo ya está registrado',
-            ], 409);
-            //throw new Exception('Este correo ya está registrado');
-        }*/
-
         return $email;
+    }
+
+    public static function validarCorreoDisponible(string $email): ?JsonResponse
+    {
+        if (User::where('email', $email)->exists()) {
+            return response()->json([
+                'message' => 'El correo de este cliente ya ha sido registrado',
+            ], 409);
+        }
+        return null;
     }
 }

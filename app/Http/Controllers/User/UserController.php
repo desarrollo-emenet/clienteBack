@@ -33,14 +33,11 @@ class UserController extends Controller
     }
     public static $rules = [
         'numero_cliente'   => 'required|string|max:6',
-        //'password'  => 'required|string|min:8',
     ];
 
     public static $rulesUpdate = [
         'old_password' => 'required|string',
         'password'  => 'required|string|min:8',
-        
-
     ];
 
     public function index()
@@ -54,6 +51,7 @@ class UserController extends Controller
     }
 
 
+    //Crear cuenta
     public function store(Request $request)
     {
         // Validar el cliente con el servicio
@@ -63,10 +61,19 @@ class UserController extends Controller
         if ($validacion instanceof \Illuminate\Http\JsonResponse) {
             Log::error('Error al validar cliente: ' . $validacion->getContent());
             return $validacion;
-        }
+        }        
 
         $email = $validacion['email']; // Extraer el email del cliente validado
 
+        $correoExistente = $this->validarService->validarCorreoDisponible($email);
+        if ($correoExistente instanceof \Illuminate\Http\JsonResponse) {
+            Log::error('Error al validar correo: ' . $correoExistente->getContent());
+            return $correoExistente;
+        }
+
+        //log::info('correoExistente', ['data' => $correoExistente]);
+        log::info('email', ['data' => $email]);
+        
         $data = $request->validate(self::$rules); // Validar los datos de entrada 
 
         // Extraer datos validados
@@ -82,6 +89,7 @@ class UserController extends Controller
         }
     }
 
+    //obtener datos de un cliente por su numero de cliente
     public function clientePorNumero(Request $request, String $numero)
     {
         $user = $request->user();
@@ -99,9 +107,8 @@ class UserController extends Controller
                 return response()->json(['message' => 'Servicio no encontrado o no pertenece al usuario'], 404);
             }
 
-            //$datosCliente = $this->validarService->validarClienteAPI($numero);   ------------------------------------
+            //$datosCliente = $this->validarService->validarClienteAPI($numero);   
             $datosCliente = $this->metadataService->getMetadataForCliente($numero, $user);
-
 
             if ($datosCliente instanceof \Illuminate\Http\JsonResponse) {
                 Log::error('Error al obtener datos del cliente: ' . $datosCliente->getContent());

@@ -5,30 +5,29 @@ namespace App\Service;
 use App\Models\Service;
 use App\Models\User;
 use App\Notifications\VerifyEmailNotification;
-use App\Service\servicios\validarService;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Nette\Utils\Random;
 
 class UserService
 {
-    // 
-    public function existeCliente(string $numeroCliente, $email)
+    public function existeCliente(string $numeroCliente, String $email)
     {
         //Validar si existe el numero de cliente
         $serviceExistente = Service::where('numero_cliente', $numeroCliente)->first();
+        //log::info('existeCliente', ['numeroCliente' => $numeroCliente, 'email' => $email]);
 
         //si existe, revisa si esta verificado el email sino reenvia correo
         if ($serviceExistente) {
-            return $this->esVerificado($serviceExistente);
+            return $this->esVerificado($serviceExistente, $email);
         }
 
         //si no existe, crear cliente
         return $this->crearCliente($numeroCliente, $email);
     }
 
-    public function esVerificado($serviceExistente)
+    public function esVerificado($serviceExistente, string $email)
     {
         // Buscar si ya existe el número de cliente
         $user = User::find($serviceExistente->user_id);
@@ -38,9 +37,11 @@ class UserService
 
             // Generar nueva contraseña temporal
             $passwordTemporal = Random::generate(8);
-            $user->password = Hash::make($passwordTemporal);
-            $user->save();
 
+            $user->update([
+                'email' => $email,
+                'password' => Hash::make($passwordTemporal),
+            ]);
 
             // Reenviar correo
             $user->notify(new VerifyEmailNotification($passwordTemporal));
@@ -60,6 +61,7 @@ class UserService
     public function crearCliente(string $numeroCliente, string $email)
     {
         $passwordTemporal = Random::generate(8);
+        //log::info('crearCliente', ['numeroCliente' => $numeroCliente, 'email' => $email, 'passwordTemporal' => $passwordTemporal]);
 
         $user = DB::transaction(function () use ($numeroCliente, $email, $passwordTemporal) {
 
