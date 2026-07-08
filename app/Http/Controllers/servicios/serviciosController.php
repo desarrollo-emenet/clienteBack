@@ -11,7 +11,6 @@ use Throwable;
 class serviciosController extends Controller
 {
     protected $clientesService;
-    //protected $rules = ['numero_cliente'   => 'required|string|max:6|unique:services,numero_cliente'];
 
     public function __construct(clientesService $clientesService)
     {
@@ -48,7 +47,7 @@ class serviciosController extends Controller
         }
     }
 
-    public function destroy($id)
+    public function destroy(string $id)
     {
         try {
             DB::beginTransaction();

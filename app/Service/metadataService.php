@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Cache;
 
 class metadataService
 {
-
     protected $consultarApiService;
     protected $validarService;
     const TTL_HOURS = 1;
