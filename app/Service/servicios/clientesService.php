@@ -5,7 +5,7 @@ namespace App\Service\servicios;
 use App\Mail\ServiceVerificationMail;
 use App\Models\Service;
 use App\Models\ServiceVerification;
-use App\Service\metadataService;
+use App\Service\User\metadataService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

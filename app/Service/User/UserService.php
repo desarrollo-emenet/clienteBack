@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\User;
 
 use App\Models\Service;
 use App\Models\User;
@@ -84,4 +84,5 @@ class UserService
             'user'    => $user,
         ], 201);
     }
+
 }

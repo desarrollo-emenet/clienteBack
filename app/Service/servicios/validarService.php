@@ -2,17 +2,22 @@
 
 namespace App\Service\servicios;
 
+use App\Models\Service;
 use App\Models\User;
+use App\Service\User\UserService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class validarService
 {
     protected $consultaApiService;
+    protected $userService;
 
-    public function __construct(consultaApiService $consultaApiService)
+    public function __construct(consultaApiService $consultaApiService, UserService $userService)
     {
         $this->consultaApiService = $consultaApiService;
+        $this->userService = $userService;
     }
 
 
@@ -62,7 +67,7 @@ class validarService
         // Extraer el email del clienteData
         //$email = $clienteData['cliente']['email'] ?? null;
 
-       $email = "crismart12ne@gmail.com"; // Email fijo para pruebas
+        $email = "crismart12ne@gmail.com"; // Email fijo para pruebas
         //$email = "mcid653@gmail.com";
 
         if (!filter_var(trim($email), FILTER_VALIDATE_EMAIL)) return response()->json([

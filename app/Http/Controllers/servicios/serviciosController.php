@@ -17,6 +17,7 @@ class serviciosController extends Controller
         $this->clientesService = $clientesService;
     }
 
+    //servicio
     public function index(Request $request)
     {
         try {
@@ -29,6 +30,7 @@ class serviciosController extends Controller
         }
     }
 
+    //añadir servicio a cuenta
     public function store(Request $request)
     {
         $request->validate([
@@ -47,6 +49,7 @@ class serviciosController extends Controller
         }
     }
 
+    //eliminar servicio de cuenta
     public function destroy(string $id)
     {
         try {
@@ -61,6 +64,7 @@ class serviciosController extends Controller
         }
     }
 
+    //confirmar servicio con codigo de 6 digitos
     public function confirmarServicio(Request $request)
     {
         $request->validate([

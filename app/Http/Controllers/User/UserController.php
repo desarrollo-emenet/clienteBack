@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\User;
 
 use App\Models\Service;
+use App\Service\User\UserService;
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Service\metadataService;
 use App\Service\servicios\validarService;
-use App\Service\UserService;
 use App\Http\Controllers\Controller;
+use App\Service\User\metadataService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Throwable;
+
 
 //use Illuminate\Support\Facades\Log;
 
@@ -56,7 +58,7 @@ class UserController extends Controller
         if ($validacion instanceof \Illuminate\Http\JsonResponse) {
             Log::error('Error al validar cliente: ' . $validacion->getContent());
             return $validacion;
-        }        
+        }
 
         $email = $validacion['email']; // Extraer el email del cliente validado
 
@@ -68,7 +70,7 @@ class UserController extends Controller
 
         //log::info('correoExistente', ['data' => $correoExistente]);
         log::info('email', ['data' => $email]);
-        
+
         $data = $request->validate(self::$rules); // Validar los datos de entrada 
 
         // Extraer datos validados
@@ -126,7 +128,7 @@ class UserController extends Controller
         }
     }
 
-//actualizar contraseña
+    //actualizar contraseña
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
@@ -159,6 +161,20 @@ class UserController extends Controller
             ], 404);
         }
     }
+
+    /*public function updateEmail(Request $request)
+    {
+
+        try {
+            $response = $this->validarService->updateEmail($request->numero_cliente);
+            return response()->json($response);
+        } catch (Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'mensaje' => 'Error al obtener datos de clientes. ' . $th->getMessage(),
+            ], 500);
+        }
+    }*/
 
     public function destroy()
     {
