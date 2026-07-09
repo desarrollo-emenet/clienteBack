@@ -14,13 +14,11 @@ use Illuminate\Support\Str;
 
 class recoveryService
 {
-
     public static $rulesUpdate = [
         'token' => 'required|string',
         'password'  => 'required|string|min:8|confirmed',
     ];
 
-    //
     public function sendEmail(Request $request)
     {
         $email = $request->input('email');
@@ -53,8 +51,7 @@ class recoveryService
         // Crear token de recuperación de contraseña
         $token = $this->createToken($email);
 
-        //
-        Log::info('Enviando correo de recuperación. Token (preview): ' . substr($token, 0, 8) . '...');
+        //Log::info('Enviando correo de recuperación. Token: ' . substr($token, 0, 8) . '...');
         // Enviar correo de recuperación de contraseña
         Mail::to($email)->send(new RecoverPasswordMail($token));
     }
@@ -89,8 +86,6 @@ class recoveryService
             ]
         );
     }
-
-
 
     public function updatePassword(Request $request)
     {

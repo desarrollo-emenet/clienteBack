@@ -17,15 +17,25 @@ class RecoveryPasswordController extends Controller
 
     public function sendEmail(Request $request)
     {
-        return response()->json(
-            $this->recoveryService->sendEmail($request)
-        );
+        try{
+            $this->recoveryService->sendEmail($request);
+        }catch(\Exception $e){
+            return response()->json([
+                "status" => "false",
+                "message" => "Ocurrió un error al enviar el correo de recuperación. " . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function updatePassword(Request $request)
     {
-        return response()->json(
-            $this->recoveryService->updatePassword($request)
-        );
+        try{
+            return $this->recoveryService->updatePassword($request);
+        }catch(\Exception $e){
+            return response()->json([
+                "status" => "false",
+                "message" => "Ocurrió un error al actualizar la contraseña. " . $e->getMessage()
+            ], 500);
+        }
     }
 }
