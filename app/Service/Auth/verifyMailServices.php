@@ -45,8 +45,8 @@ class verifyMailServices
         $this->urlFrontend = env('FRONTEND_URL_LOCAL');
 
         $this->token = Str::random(64);
-        Cache::put("email_verified_{token}", $user->id, now()->addMinutes(5));
-        //Log::info('Token almacenado en la caché: ' . $token);
+        Cache::put("email_verified_{$this->token}", $user->id, now()->addMinutes(5));
+        Log::info('Token almacenado en la caché: ' . $this->token);
         return redirect($this->urlFrontend . '/email-verificado?token=' . urlencode($this->token));
     }
 
@@ -65,11 +65,11 @@ class verifyMailServices
 
         Log::info('Verificando token en la caché: ' . $token);
         // Buscar el token en la caché
-        $userId = Cache::get("email_verified_{token}");
+        $userId = Cache::get("email_verified_{$token}");
 
         // Si el token es válido, devolver true y eliminarlo de la caché
         if ($userId) {
-            Cache::forget("email_verified_{token}");
+            Cache::forget("email_verified_{$token}");
             return response()->json(['valid' => true]);
         }
 
