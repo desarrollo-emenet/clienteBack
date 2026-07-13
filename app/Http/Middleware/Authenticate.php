@@ -12,10 +12,14 @@ class Authenticate extends Middleware
      * @param  \Illuminate\Http\Request  $request
      * @return string|null
      */
+
+    public $URLAPI;
+
     protected function redirectTo($request)
     {
+        $this->URLAPI = env('FRONTEND_URL_LOCAL');
         if (! $request->expectsJson()) {
-            return 'http://localhost:4200/email-verificado';
+            return ($this->URLAPI . '/email-verificado');
         }
     }
 }

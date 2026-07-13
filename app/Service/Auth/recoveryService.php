@@ -59,12 +59,12 @@ class recoveryService
     private function createToken(String $email): string
     {
         // Verificar si ya existe un token para este email
-        $oldToken = DB::table('password_resets')->where('email', $email)->first();
+        //$oldToken = DB::table('password_resets')->where('email', $email)->first();
 
         // Si ya existe un token, reutilizarlo
-        if ($oldToken && isset($oldToken->token)) {
+        /*if ($oldToken && isset($oldToken->token)) {
             return (string) $oldToken->token;
-        }
+        }*/
 
         // Si no existe un token, crear uno nuevo
         $token = Str::random(60);
@@ -85,6 +85,46 @@ class recoveryService
                 'created_at' => Carbon::now()
             ]
         );
+    }
+
+    public function validarToken(Request $request){
+
+    $request->validate([
+        'token' => 'required|string'
+    ]);
+
+    $token = DB::table('password_resets')
+        ->where('token', $request->token)
+        ->first();
+
+        if (!$token) {
+        return response()->json([
+            "status" => false,
+            "message" => "El enlace ya fue utilizado o no existe."
+        ], 400);
+    }
+
+    $expire = config('auth.password.users.expire', 60);
+
+    if (
+        Carbon::parse($token->created_at)
+            ->addMinutes($expire)
+            ->isPast()
+    ) {
+
+        DB::table('password_resets')
+            ->where('email', $token->email)
+            ->delete();
+
+        return response()->json([
+            "status" => false,
+            "message" => "El enlace ha expirado."
+        ], 400);
+    }
+
+    return response()->json([
+        "status" => true
+    ]);
     }
 
     public function updatePassword(Request $request)

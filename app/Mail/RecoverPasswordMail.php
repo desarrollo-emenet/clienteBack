@@ -14,7 +14,7 @@ class RecoverPasswordMail extends Mailable
     use Queueable, SerializesModels;
 
     public $token;
-    public $URLAPI;
+    public $URLAPI; 
     public $url;
 
     /**

@@ -18,7 +18,7 @@ class RecoveryPasswordController extends Controller
     public function sendEmail(Request $request)
     {
         try{
-            $this->recoveryService->sendEmail($request);
+           return $this->recoveryService->sendEmail($request);
         }catch(\Throwable $e){
             return response()->json([
                 "status" => "false",
@@ -30,12 +30,24 @@ class RecoveryPasswordController extends Controller
     public function updatePassword(Request $request)
     {
         try{
-            $this->recoveryService->updatePassword($request);
+            return $this->recoveryService->updatePassword($request);
         }catch(\Throwable $e){
             return response()->json([
                 "status" => "false",
                 "message" => "Ocurrió un error al actualizar la contraseña. " . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function validarToken(Request $request){
+
+    try {
+        return $this->recoveryService->validarToken($request);
+    } catch (\Throwable $e) {
+        return response()->json([
+                "status" => "false",
+                "message" => "Ocurrió un error al actualizar la contraseña. " . $e->getMessage()
+            ], 500);
+    }
     }
 }
