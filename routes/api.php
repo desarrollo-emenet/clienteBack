@@ -58,9 +58,9 @@ Route::middleware('auth:sanctum')->get('cliente/{numero}', [UserController::clas
 
 
 //rutas de recuperacion de contraseña
+Route::post('/recoveryPassword/verify-token', [RecoveryPasswordController::class, 'validarToken']);
 Route::post('auth/recoverPassword', [RecoveryPasswordController::class,  'sendEmail']);
 Route::put('auth/updatePassword', [RecoveryPasswordController::class,  'updatePassword']);
 Route::post('/verify-token', [VerifyMailController::class, 'validarToken']);
-Route::post('/recoveryPassword/verify-token', [RecoveryPasswordController::class, 'validarToken']);
 
 

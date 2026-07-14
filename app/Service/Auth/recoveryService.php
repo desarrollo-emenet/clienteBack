@@ -87,71 +87,81 @@ class recoveryService
         );
     }
 
-    public function validarToken(Request $request){
 
-    $request->validate([
-        'token' => 'required|string'
-    ]);
+    private function ObtenerTokenValidad(string $token)
+    {
 
-    $token = DB::table('password_resets')
-        ->where('token', $request->token)
-        ->first();
+        $passwordReset = DB::table('password_resets')
+            ->where('token', $token)
+            ->first();
 
-        if (!$token) {
-        return response()->json([
-            "status" => false,
-            "message" => "El enlace ya fue utilizado o no existe."
-        ], 400);
-    }
+        //sino existe
+        if (!$passwordReset) {
+            response()->json([
+                'status' => false,
+                'messaje' => 'Ya se uso el enlace o no existe'
+            ], 400);
+            return null;
+        }
 
-    $expire = config('auth.password.users.expire', 60);
+        //tiempo de expiracion
+        $expire = config('auth.password.users.expire', 60);
 
-    if (
-        Carbon::parse($token->created_at)
+        //verificar tiempo
+        if (
+            Carbon::parse($passwordReset->created_at)
             ->addMinutes($expire)
             ->isPast()
-    ) {
+        ) {
+            // Eliminar el token expirado
+            DB::table('password_resets')
+                ->where('email', $passwordReset->email)
+                ->delete();
 
-        DB::table('password_resets')
-            ->where('email', $token->email)
-            ->delete();
+            response()->json([
+                'status' => false,
+                'message' => 'El enlace ha expirado.',
+            ], 400);
+            return null;
+        }
+
+        return $passwordReset;
+    }
+    public function validarToken(Request $request)
+    {
+        $request->validate([
+            'token' => 'required|string'
+        ]);
+
+        $resultado = $this->ObtenerTokenValidad($request->token);
+
+        if (!$resultado) {
+            return response()->json([
+                "status" => false,
+                "message" => "enlace invalido"
+            ], 400);
+        }
 
         return response()->json([
-            "status" => false,
-            "message" => "El enlace ha expirado."
-        ], 400);
-    }
-
-    return response()->json([
-        "status" => true
-    ]);
+            "status" => true,
+            "message" => "Token válido."
+        ], 200);
     }
 
     public function updatePassword(Request $request)
     {
         $data = $request->validate(self::$rulesUpdate);
 
-        // Verificar si el token existe y es válido
-        $token = DB::table('password_resets')->where('token', $data['token'])->first();
-        if (!$token) {
+        $tokenData = $this->ObtenerTokenValidad($data['token']);
+
+        if (!$tokenData) {
             return response()->json([
-                "status" => "false",
-                "message" => "Token inválido o inexistente."
+                "status" => false,
+                "message" => "enlace invalido"
             ], 400);
         }
 
-        //los token solo tienen duracion de 60 minutos
-        $expire = config('auth.password.users.expire', 60);
-
-        //Verificar hora de creacion del token si aun es valido
-        if(Carbon::parse($token->created_at)
-            ->diffInMinutes(Carbon::now()) > $expire) {
-            DB::table('password_resets')->where('email', $token->email)->delete();
-            return [
-                "status" => "false",
-                "message" => "Token Expirado"
-            ];
-        }
+        $token = $tokenData;
 
         // Actualizar la contraseña del usuario
         $user = User::where('email', $token->email)->first();
@@ -163,10 +173,16 @@ class recoveryService
             ], 404);
         }
 
-        $user->update(['password' => Hash::make($data['password'])]);
+        DB::transaction(function () use ($user, $data, $token) {
 
-        // Eliminar token usado
-        DB::table('password_resets')->where('email', $token->email)->delete();
+            $user->update([
+                'password' => Hash::make($data['password'])
+            ]);
+
+            DB::table('password_resets')
+                ->where('email', $token->email)
+                ->delete();
+        });
 
         return response()->json([
             "status" => "true",
