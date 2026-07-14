@@ -40,8 +40,6 @@ class PagoraliaController extends Controller
 
             $clienteData = $datosCliente;
 
-            //$monto = $clienteData['cliente']['deuda'];
-
             //si el cliente tiene deuda, se toma esa cantidad, sino se calcula el total mensual * 1 para adelantarse al pago del mes
             if ($clienteData['cliente']['deuda'] > 0) {
                 $monto = floatval($clienteData['cliente']['deuda']);

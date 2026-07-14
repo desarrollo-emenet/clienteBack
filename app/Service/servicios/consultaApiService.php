@@ -3,6 +3,7 @@
 namespace App\Service\servicios;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class consultaApiService
 {
@@ -18,6 +19,7 @@ class consultaApiService
             ->get($web_url . $numeroCliente . '?conexion=' . $conexion);
 
         if ($peticion->failed()) {
+            Log::error('Error en la petición a la API: ' . $peticion->body());
             return []; // Retornar null para indicar error en la petición
         }
         return $peticion->json();

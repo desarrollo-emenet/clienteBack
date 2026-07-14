@@ -2,19 +2,17 @@
 
 namespace App\Http\Controllers\User;
 
-
-
 use App\Models\Service;
+use App\Service\User\UserService;
 use Illuminate\Http\Request;
 use App\Models\User;
-use App\Service\metadataService;
 use App\Service\servicios\validarService;
-use App\Service\UserService;
 use App\Http\Controllers\Controller;
-
-
+use App\Service\User\metadataService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Throwable;
+
 
 //use Illuminate\Support\Facades\Log;
 
@@ -33,14 +31,11 @@ class UserController extends Controller
     }
     public static $rules = [
         'numero_cliente'   => 'required|string|max:6',
-        //'password'  => 'required|string|min:8',
     ];
 
     public static $rulesUpdate = [
         'old_password' => 'required|string',
         'password'  => 'required|string|min:8',
-        
-
     ];
 
     public function index()
@@ -53,7 +48,7 @@ class UserController extends Controller
         ], 200);
     }
 
-
+    //Crear cuenta
     public function store(Request $request)
     {
         // Validar el cliente con el servicio
@@ -66,6 +61,15 @@ class UserController extends Controller
         }
 
         $email = $validacion['email']; // Extraer el email del cliente validado
+
+        /*$correoExistente = $this->validarService->validarCorreoDisponible($email);
+        if ($correoExistente instanceof \Illuminate\Http\JsonResponse) {
+            Log::error('Error al validar correo: ' . $correoExistente->getContent());
+            return $correoExistente;
+        }*/
+
+        //log::info('correoExistente', ['data' => $correoExistente]);
+        log::info('email', ['data' => $email]);
 
         $data = $request->validate(self::$rules); // Validar los datos de entrada 
 
@@ -82,6 +86,7 @@ class UserController extends Controller
         }
     }
 
+    //obtener datos de un cliente por su numero de cliente
     public function clientePorNumero(Request $request, String $numero)
     {
         $user = $request->user();
@@ -99,9 +104,8 @@ class UserController extends Controller
                 return response()->json(['message' => 'Servicio no encontrado o no pertenece al usuario'], 404);
             }
 
-            //$datosCliente = $this->validarService->validarClienteAPI($numero);   ------------------------------------
+            //$datosCliente = $this->validarService->validarClienteAPI($numero);   
             $datosCliente = $this->metadataService->getMetadataForCliente($numero, $user);
-
 
             if ($datosCliente instanceof \Illuminate\Http\JsonResponse) {
                 Log::error('Error al obtener datos del cliente: ' . $datosCliente->getContent());
@@ -124,7 +128,7 @@ class UserController extends Controller
         }
     }
 
-
+    //actualizar contraseña
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
@@ -155,6 +159,19 @@ class UserController extends Controller
                 'message' => 'Error al actualizar la contraseña',
                 'error' => $e->getMessage()
             ], 404);
+        }
+    }
+
+    //actualizar email desde la api
+    public function updateEmail(Request $request)
+    {
+        try {
+            return $this->validarService->updateEmail($request->numero_cliente);
+        } catch (Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'mensaje' => 'Error al obtener datos de clientes. ' . $th->getMessage(),
+            ], 500);
         }
     }
 

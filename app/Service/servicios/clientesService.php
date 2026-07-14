@@ -5,7 +5,7 @@ namespace App\Service\servicios;
 use App\Mail\ServiceVerificationMail;
 use App\Models\Service;
 use App\Models\ServiceVerification;
-use App\Service\metadataService;
+use App\Service\User\metadataService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -25,7 +25,6 @@ class clientesService
         $this->validarService = $validarService;
         $this->consultaApiService = $consultaApiService;
         $this->metadataService = $metadataService;
-
     }
 
     public function index(Request $request)
@@ -39,7 +38,7 @@ class clientesService
         foreach ($servicios as $servicio) {
             // Obtener datos del cliente usando el número de cliente encriptado
             //$cliente = consultaApiService::peticionAPI((string) $servicio->numero_cliente, 'false');  -------------------------------
-            $cliente = $this->metadataService->getMetadataForCliente((string) $servicio->numero_cliente,$user);
+            $cliente = $this->metadataService->getMetadataForCliente((string) $servicio->numero_cliente, $user);
             if ($cliente) {
                 $cliente['idServicio'] = $servicio->id;
                 $clientesData[] = $cliente;
@@ -54,6 +53,7 @@ class clientesService
     public function store(Request $request)
     {
         $validacion = $this->validarService->validarClienteCompleto($request->numero_cliente);
+        Log::info('validacion', ['data' => $validacion]);
         if ($validacion instanceof JsonResponse) return $validacion; // Retornar error si hubo problema en validación
 
         // Extraer datos validados
@@ -75,7 +75,6 @@ class clientesService
             'expires_at' => now()->addMinutes(10), //expira el codigo en 10 minutos
             'user_id' => $userId,
         ]);
-
 
         try {
             Mail::to($email)->send(new ServiceVerificationMail($codigo));
@@ -115,16 +114,16 @@ class clientesService
         ], 409);
 
         //eliminar metadata asociada al numero_cliente
-        $this->metadataService->eliminarMetadata(Auth::user(),$service->numero_cliente);
+        $this->metadataService->eliminarMetadata(Auth::user(), $service->numero_cliente);
 
         // Eliminar el servicio
-        $service->delete();        
+        $service->delete();
 
         DB::commit();
         return response()->json(['message' => 'Servicio eliminado'], 200);
     }
 
-    public function confirmarServicio( Request $request)
+    public function confirmarServicio(Request $request)
     {
         $userId = $request->user()->id;
         //verificar que el codigo y numero_cliente coincidan con el registro de verificacion

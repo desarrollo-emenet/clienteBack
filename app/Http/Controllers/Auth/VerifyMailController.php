@@ -4,54 +4,40 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Auth\Events\Verified;
-use App\Models\User;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Str;
+use App\Service\Auth\verifyMailServices;
+use Illuminate\Support\Facades\Log;
 
 class VerifyMailController extends Controller
 {
-    public function verify(Request $request, $id, $hash)
+    private $verifyMailServices;
+
+    public function __construct(verifyMailServices $verifyMailServices)
     {
-        $user = User::findOrFail($id);
-        $urlFrontend = env('FRONTEND_URL_LOCAL');
+        $this->verifyMailServices = $verifyMailServices;
+    }
 
-        // Validar el hash del enlace
-        if (! hash_equals($hash, sha1($user->getEmailForVerification()))) {
-            return response()->json(['message' => 'Enlace inválido'], 403);
+    public function verify(Request $request, string $id, string $hash)
+    {
+        try {
+            Log::info('hola');
+            return $this->verifyMailServices->verify($request, $id, $hash);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'mensaje' => 'Ocurrió un error al verificar el correo. ' . $th->getMessage(),
+            ], 500);
         }
-
-        // Segunda visita: correo ya verificado → redirigir directo al mensaje informativo
-        if ($user->hasVerifiedEmail()) {
-            return redirect($urlFrontend . '/email-verificado?yaVerificado=true');
-        }
-
-        // Primera visita: marcar como verificado y generar token de sesión
-        $user->markEmailAsVerified();
-        event(new Verified($user));
-
-        $token = Str::random(64);
-        Cache::put("email_verified_{$token}", $user->id, now()->addMinutes(5));
-
-        return redirect($urlFrontend . '/email-verificado?token=' . urlencode($token));
     }
 
     public function validarToken(Request $request)
     {
-        $token = $request->input('token');
-
-        if (!$token) {
-            return response()->json(['valid' => false], 400);
+        try {
+            return $this->verifyMailServices->validarToken($request);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'mensaje' => 'Ocurrió un error al validar el token. ' . $th->getMessage(),
+            ], 500);
         }
-
-        $userId = Cache::get("email_verified_{$token}");
-
-        if ($userId) {
-            Cache::forget("email_verified_{$token}");
-            return response()->json(['valid' => true]);
-        }
-
-        return response()->json(['valid' => false], 403);
     }
 }
-

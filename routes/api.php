@@ -54,10 +54,13 @@ Route::post('/email/verification-notification', function (Request $request) {
 //rutas controlador usuario
 Route::apiResource('usuarios',UserController::class);
 Route::middleware('auth:sanctum')->get('cliente/{numero}', [UserController::class, 'clientePorNumero']);
+Route::get('updateEmail', [UserController::class, 'updateEmail']);
 
 
 //rutas de recuperacion de contraseña
+Route::post('/recoveryPassword/verify-token', [RecoveryPasswordController::class, 'validarToken']);
 Route::post('auth/recoverPassword', [RecoveryPasswordController::class,  'sendEmail']);
 Route::put('auth/updatePassword', [RecoveryPasswordController::class,  'updatePassword']);
 Route::post('/verify-token', [VerifyMailController::class, 'validarToken']);
+
 

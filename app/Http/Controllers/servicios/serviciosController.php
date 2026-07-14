@@ -11,13 +11,13 @@ use Throwable;
 class serviciosController extends Controller
 {
     protected $clientesService;
-    //protected $rules = ['numero_cliente'   => 'required|string|max:6|unique:services,numero_cliente'];
 
     public function __construct(clientesService $clientesService)
     {
         $this->clientesService = $clientesService;
     }
 
+    //servicio
     public function index(Request $request)
     {
         try {
@@ -30,6 +30,7 @@ class serviciosController extends Controller
         }
     }
 
+    //añadir servicio a cuenta
     public function store(Request $request)
     {
         $request->validate([
@@ -48,7 +49,8 @@ class serviciosController extends Controller
         }
     }
 
-    public function destroy($id)
+    //eliminar servicio de cuenta
+    public function destroy(string $id)
     {
         try {
             DB::beginTransaction();
@@ -62,6 +64,7 @@ class serviciosController extends Controller
         }
     }
 
+    //confirmar servicio con codigo de 6 digitos
     public function confirmarServicio(Request $request)
     {
         $request->validate([

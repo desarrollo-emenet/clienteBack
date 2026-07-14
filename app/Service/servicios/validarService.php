@@ -2,33 +2,38 @@
 
 namespace App\Service\servicios;
 
+use App\Models\Service;
 use App\Models\User;
+use App\Notifications\VerifyEmailNotification;
+use App\Service\User\UserService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Nette\Utils\Random;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class validarService
 {
     protected $consultaApiService;
+    protected $userService;
 
-    public function __construct(consultaApiService $consultaApiService)
+    public function __construct(consultaApiService $consultaApiService, UserService $userService)
     {
         $this->consultaApiService = $consultaApiService;
+        $this->userService = $userService;
     }
 
 
     public function validarClienteCompleto(string $numeroCliente)
     {
-        //Descodificar número
-        /*$numeroCliente = codificacionService::descodificarClienteConLetra($numEncriptado);
-        if ($numeroCliente instanceof JsonResponse) {
-            return $numeroCliente; // Error en descodificación
-        }*/
-
         // Validar con API
         $clienteData = $this->validarClienteAPI($numeroCliente, true);
+        //Log::info('clienteData', ['data' => $clienteData]);
         if ($clienteData instanceof JsonResponse) return $clienteData; // Error en API
 
 
         $clienteEmail = $this->obtenerEmail($clienteData);
+        //Log::info('clienteEmail', ['email' => $clienteEmail]);
         if ($clienteEmail instanceof JsonResponse) return $clienteEmail; // Error al obtener email
 
         // retornar datos
@@ -55,12 +60,12 @@ class validarService
         if ($clasificacion == 'BAJA') return response()->json([
             'success' => "error",
             'message' => 'Este servicio está dado de baja y no puede registrarse'
-        ], 422);
+        ], 404);
 
         return $clienteData;
     }
 
-    public static function obtenerEmail(array $clienteData): ?string
+    public static function obtenerEmail(array $clienteData): string|JsonResponse
     {
         // Extraer el email del clienteData
         //$email = $clienteData['cliente']['email'] ?? null;
@@ -72,16 +77,55 @@ class validarService
             'message' => 'El correo del cliente no es valido o no esta registrado.'
         ], 422);
 
-        /*$userExistente = User::where('email', $email)->exists();
-
-        // Si el email ya existe, retornar un error
-        if ($userExistente) {
-            return response()->json([
-                'message' => 'Este correo ya está registrado',
-            ], 409);
-            //throw new Exception('Este correo ya está registrado');
-        }*/
-
         return $email;
+    }
+
+    public static function validarCorreoDisponible(string $email): ?JsonResponse
+    {
+        if (User::where('email', $email)->exists()) {
+            return response()->json([
+                'message' => 'El correo de este cliente ya ha sido registrado',
+            ], 409);
+        }
+        return null;
+    }
+
+    public function updateEmail(string $numeroCliente)
+    {
+        $validacion = $this->validarClienteCompleto($numeroCliente);
+
+        if ($validacion instanceof JsonResponse) {
+            return $validacion;
+        }
+
+        $nuevoEmail = $validacion['email'];
+
+        $user = User::select('users.*')
+            ->join('services', 'services.user_id', '=', 'users.id')
+            ->where('services.numero_cliente', $numeroCliente)
+            ->first();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'No existe un usuario asociado a este número de cliente.'
+            ], 404);
+        }
+
+        if ($user->email === $nuevoEmail) {
+            return response()->json([
+                'updated' => false,
+                'message' => 'El correo ya está actualizado.'
+            ]);
+        }
+
+        $user->update([
+            'email' => $nuevoEmail
+        ]);
+
+        return response()->json([
+            'updated' => true,
+            'message' => 'Correo actualizado correctamente.',
+            'email' => $nuevoEmail
+        ]);
     }
 }

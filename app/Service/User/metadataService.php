@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\User;
 
 use App\Models\clientMetadata;
 use App\Models\User;
@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Cache;
 
 class metadataService
 {
-
     protected $consultarApiService;
     protected $validarService;
     const TTL_HOURS = 1;

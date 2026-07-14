@@ -38,6 +38,7 @@ class authController extends Controller
         try {
             // $request->user()->tokens()->delete(); borrar todos los token creados del usuario autenticado
             auth('sanctum')->user()->currentAccessToken()->delete();
+            auth('sanctum')->user()->tokens()->delete();
             return response()->json([
                 'status' => 'error',
                 "mensaje" => "Cierre de sesión exitoso"
