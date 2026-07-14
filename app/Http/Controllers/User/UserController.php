@@ -162,19 +162,18 @@ class UserController extends Controller
         }
     }
 
-    /*public function updateEmail(Request $request)
+    //actualizar email desde la api
+    public function updateEmail(Request $request)
     {
-
         try {
-            $response = $this->validarService->updateEmail($request->numero_cliente);
-            return response()->json($response);
+            return $this->validarService->updateEmail($request->numero_cliente);
         } catch (Throwable $th) {
             return response()->json([
                 'status' => 'error',
                 'mensaje' => 'Error al obtener datos de clientes. ' . $th->getMessage(),
             ], 500);
         }
-    }*/
+    }
 
     public function destroy()
     {
