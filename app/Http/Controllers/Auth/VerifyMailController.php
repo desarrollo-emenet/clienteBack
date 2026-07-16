@@ -19,7 +19,6 @@ class VerifyMailController extends Controller
     public function verify(Request $request, string $id, string $hash)
     {
         try {
-            Log::info('hola');
             return $this->verifyMailServices->verify($request, $id, $hash);
         } catch (\Throwable $th) {
             return response()->json([

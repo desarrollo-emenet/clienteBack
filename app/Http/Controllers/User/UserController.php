@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Service\servicios\validarService;
 use App\Http\Controllers\Controller;
 use App\Service\User\metadataService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -77,8 +78,10 @@ class UserController extends Controller
         $numCliente = $data['numero_cliente'];
 
         try {
+            DB::beginTransaction();
             return $this->userService->existeCliente($numCliente, $email);
         } catch (\Exception $e) {
+            DB::rollback();
             return response()->json([
                 'message' => 'Error al crear la cuenta',
                 'error'   => $e->getMessage(),

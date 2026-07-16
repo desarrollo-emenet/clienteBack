@@ -19,12 +19,26 @@ class UserService
         //log::info('existeCliente', ['numeroCliente' => $numeroCliente, 'email' => $email]);
 
         //si existe, revisa si esta verificado el email sino reenvia correo
-        if ($serviceExistente) {
+        /*if ($serviceExistente) {
             return $this->esVerificado($serviceExistente, $email);
-        }
+        }*/
 
         //si no existe, crear cliente
-        return $this->crearCliente($numeroCliente, $email);
+        //return $this->crearCliente($numeroCliente, $email);
+
+        try {
+            DB::commit();
+
+            if ($serviceExistente) {
+                return $this->esVerificado($serviceExistente, $email);
+            }
+            return $this->crearCliente($numeroCliente, $email);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'mensaje' => 'Ocurrió al crear cliente. ' . $th->getMessage(),
+            ], 500);
+        }
     }
 
     public function esVerificado($serviceExistente, string $email)
@@ -84,5 +98,4 @@ class UserService
             'user'    => $user,
         ], 201);
     }
-
 }
