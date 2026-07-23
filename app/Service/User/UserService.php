@@ -73,7 +73,7 @@ class UserService
     public function crearCliente(string $numeroCliente, string $email)
     {
         $passwordTemporal = Random::generate(8);
-        //log::info('crearCliente', ['numeroCliente' => $numeroCliente, 'email' => $email, 'passwordTemporal' => $passwordTemporal]);
+        log::info('crearCliente', ['numeroCliente' => $numeroCliente, 'email' => $email, 'passwordTemporal' => $passwordTemporal]);
 
         $user = DB::transaction(function () use ($numeroCliente, $email, $passwordTemporal) {
 

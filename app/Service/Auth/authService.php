@@ -29,7 +29,17 @@ class authService
             'mensaje' => 'Cuenta no verificada'
         ], 403);
 
-        $tokenName = $credentials['email'] ?? $request['cliente'];
+        //solo 2 sesiones
+        $activeTokens = $user->tokens()->count();
+
+        if ($activeTokens >= 2) {
+            $user->tokens()
+                ->orderBy('created_at', 'asc')
+                ->first()
+                ->delete();
+        }
+
+        $tokenName = $request['cliente'];
         $token = $user->createToken($tokenName)->plainTextToken;
 
         return response()->json([
