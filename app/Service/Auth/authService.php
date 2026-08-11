@@ -17,34 +17,27 @@ class authService
             ->where('email', $request->cliente)
             ->orWhere('numero_cliente', $request->cliente)->first();
 
-        Log::info($user);
-
         if (!$user || !Hash::check($request->password, $user->password)) return response()->json([
             'status' => "error",
-            'mensaje' => 'El usuario y/o contraseña son incorrectos'
+            'message' => 'El usuario y/o contraseña son incorrectos'
         ], 401);
 
         if (!$user->hasVerifiedEmail()) return response()->json([
             'status' => "error",
-            'mensaje' => 'Cuenta no verificada'
+            'message' => 'La cuenta no ha sido verificada, por favor revisa tu correo electrónico para verificar tu cuenta'
         ], 403);
 
         //solo 2 sesiones
         $activeTokens = $user->tokens()->count();
 
-        if ($activeTokens >= 2) {
-            $user->tokens()
-                ->orderBy('created_at', 'asc')
-                ->first()
-                ->delete();
-        }
+        if ($activeTokens >= 2)  $user->tokens()->orderBy('created_at', 'asc')->first()->delete();
 
         $tokenName = $request['cliente'];
         $token = $user->createToken($tokenName)->plainTextToken;
 
         return response()->json([
             "status" => 'success',
-            "mensaje" => "Usuario autenticado",
+            "message" => "Usuario autenticado",
             "token" => $token
         ], 200);
     }

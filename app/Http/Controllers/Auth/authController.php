@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Service\Auth\authService;
-use Illuminate\Http\Request;
+use App\Http\Requests\auth\loginRequest;
 use Throwable;
 
 class authController extends Controller
@@ -16,19 +16,15 @@ class authController extends Controller
     }
 
 
-    public function login(Request $request)
+    public function login(loginRequest $request)
     {
-        $request->validate([
-            'cliente' => ['required', 'string'],
-            'password' => ['required', 'string'],
-        ], [], ['cliente' => 'Cliente', 'password' => "Contraseña",]);
-
         try {
             return $this->authService->login($request);
         } catch (Throwable $th) {
             return response()->json([
                 'status' => 'error',
-                'mensaje' => 'Ocurrió un error al obtener la información. ' . $th->getMessage(),
+                'message' => 'Ocurrió un error al iniciar sesión. ',
+                "error" => $th->getMessage(),
             ], 500);
         }
     }
