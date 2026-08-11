@@ -2,25 +2,16 @@
 
 namespace App\Service\servicios;
 
-use App\Models\Service;
 use App\Models\User;
-use App\Notifications\VerifyEmailNotification;
-use App\Service\User\UserService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Nette\Utils\Random;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class validarService
 {
     protected $consultaApiService;
-    protected $userService;
 
-    public function __construct(consultaApiService $consultaApiService, UserService $userService)
+    public function __construct(consultaApiService $consultaApiService)
     {
         $this->consultaApiService = $consultaApiService;
-        $this->userService = $userService;
     }
 
 
@@ -51,7 +42,7 @@ class validarService
         if (!$clienteData) return response()->json([
             'success' => "error",
             'message' => 'Error al obtener datos externos',
-        ], 422);
+        ], 500);
 
         //Verificar clasificación de baja
         if (!$verificarBaja) return $clienteData;
@@ -70,7 +61,7 @@ class validarService
         // Extraer el email del clienteData
         //$email = $clienteData['cliente']['email'] ?? null;
 
-        $email = "crismart12ne@gmail.com"; // Email fijo para pruebas
+        $email = "cesarivan25479@gmail.com"; // Email fijo para pruebas
 
         if (!filter_var(trim($email), FILTER_VALIDATE_EMAIL)) return response()->json([
             'success' => "error",

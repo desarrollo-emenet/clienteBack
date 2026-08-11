@@ -8,12 +8,30 @@ use App\Notifications\VerifyEmailNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use App\Service\servicios\validarService;
 use Nette\Utils\Random;
 
 class UserService
 {
-    public function existeCliente(string $numeroCliente, String $email)
+    protected $validarService;
+
+    public function __construct(validarService $validarService)
     {
+        $this->validarService = $validarService;
+    }
+
+    public function existeCliente(string $numeroCliente)
+    {
+        // Validar el cliente con el servicio
+        $validacion = $this->validarService->validarClienteCompleto($numeroCliente);
+
+        // Si la validación devuelve un error, retornar esa respuesta
+        if ($validacion instanceof \Illuminate\Http\JsonResponse) {
+            Log::error('Error al validar cliente: ' . $validacion->getContent());
+            return $validacion;
+        }
+
+        $email = $validacion['email']; // Extraer el email del cliente validado
         //Validar si existe el numero de cliente
         $serviceExistente = Service::where('numero_cliente', $numeroCliente)->first();
         //log::info('existeCliente', ['numeroCliente' => $numeroCliente, 'email' => $email]);
@@ -26,19 +44,10 @@ class UserService
         //si no existe, crear cliente
         //return $this->crearCliente($numeroCliente, $email);
 
-        try {
-            DB::commit();
-
-            if ($serviceExistente) {
-                return $this->esVerificado($serviceExistente, $email);
-            }
-            return $this->crearCliente($numeroCliente, $email);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'status' => 'error',
-                'mensaje' => 'Ocurrió al crear cliente. ' . $th->getMessage(),
-            ], 500);
+        if ($serviceExistente) {
+            return $this->esVerificado($serviceExistente, $email);
         }
+        return $this->crearCliente($numeroCliente, $email);
     }
 
     public function esVerificado($serviceExistente, string $email)
@@ -57,14 +66,16 @@ class UserService
 
             // Reenviar correo
             $user->notify(new VerifyEmailNotification($passwordTemporal));
-
+            DB::commit();
             return response()->json([
-                'mensaje' => 'Ya existe una cuenta sin verificar. Se ha reenviado el correo.',
+                'status' => "success",
+                'message' => 'Ya existe una cuenta sin verificar. Se ha reenviado el correo.',
             ], 200);
         }
-
         // Si YA está verificado
+        DB::commit();
         return response()->json([
+            'status' => "success",
             'message' => 'Este número de cliente ya está registrado y verificado.',
         ], 409);
     }
@@ -74,25 +85,20 @@ class UserService
     {
         $passwordTemporal = Random::generate(8);
         log::info('crearCliente', ['numeroCliente' => $numeroCliente, 'email' => $email, 'passwordTemporal' => $passwordTemporal]);
+        //guardar en tabla users email y password
+        $user = User::create([
+            'email'    => $email,
+            'password' => Hash::make($passwordTemporal), //contraseña temporal
+        ]);
+        //guardar en tabla services numero de cliente
+        Service::create([
+            'numero_cliente' => $numeroCliente,
+            'user_id' => $user->id,
+        ]);
 
-        $user = DB::transaction(function () use ($numeroCliente, $email, $passwordTemporal) {
-
-            //guardar en tabla users email y password
-            $user = User::create([
-                'email'    => $email,
-                'password' => Hash::make($passwordTemporal), //contraseña temporal
-            ]);
-            //guardar en tabla services numero de cliente
-            Service::create([
-                'numero_cliente' => $numeroCliente,
-                'user_id' => $user->id,
-            ]);
-
-            //Evento de registro 
-            $user->notify(new VerifyEmailNotification($passwordTemporal));
-
-            return $user;
-        });
+        //Evento de registro
+        $user->notify(new VerifyEmailNotification($passwordTemporal));
+        DB::commit();
         return response()->json([
             'mensaje' => 'Registro creado correctamente',
             'user'    => $user,

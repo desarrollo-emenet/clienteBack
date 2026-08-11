@@ -12,6 +12,7 @@ use App\Service\User\metadataService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use App\Http\Requests\users\storeRequest;
 use Throwable;
 
 
@@ -30,9 +31,6 @@ class UserController extends Controller
         $this->userService = $UserService;
         $this->metadataService = $metadataService;
     }
-    public static $rules = [
-        'numero_cliente'   => 'required|string|max:6',
-    ];
 
     public static $rulesUpdate = [
         'old_password' => 'required|string',
@@ -50,18 +48,9 @@ class UserController extends Controller
     }
 
     //Crear cuenta
-    public function store(Request $request)
+    public function store(storeRequest $request)
     {
-        // Validar el cliente con el servicio
-        $validacion = $this->validarService->validarClienteCompleto($request->numero_cliente);
 
-        // Si la validación devuelve un error, retornar esa respuesta
-        if ($validacion instanceof \Illuminate\Http\JsonResponse) {
-            Log::error('Error al validar cliente: ' . $validacion->getContent());
-            return $validacion;
-        }
-
-        $email = $validacion['email']; // Extraer el email del cliente validado
 
         /*$correoExistente = $this->validarService->validarCorreoDisponible($email);
         if ($correoExistente instanceof \Illuminate\Http\JsonResponse) {
@@ -70,16 +59,12 @@ class UserController extends Controller
         }*/
 
         //log::info('correoExistente', ['data' => $correoExistente]);
-        log::info('email', ['data' => $email]);
-
-        $data = $request->validate(self::$rules); // Validar los datos de entrada 
 
         // Extraer datos validados
-        $numCliente = $data['numero_cliente'];
 
         try {
             DB::beginTransaction();
-            return $this->userService->existeCliente($numCliente, $email);
+            return $this->userService->existeCliente($request->numero_cliente);
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json([
@@ -107,7 +92,7 @@ class UserController extends Controller
                 return response()->json(['message' => 'Servicio no encontrado o no pertenece al usuario'], 404);
             }
 
-            //$datosCliente = $this->validarService->validarClienteAPI($numero);   
+            //$datosCliente = $this->validarService->validarClienteAPI($numero);
             $datosCliente = $this->metadataService->getMetadataForCliente($numero, $user);
 
             if ($datosCliente instanceof \Illuminate\Http\JsonResponse) {
