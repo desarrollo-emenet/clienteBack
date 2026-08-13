@@ -12,10 +12,12 @@ class authService
     public function login($request)
     {
         $user = User::from('users as u')
-            ->select('u.*')
+            ->select('u.*', 's.numero_cliente')
             ->join("services as s", 'u.id', 's.user_id')
             ->where('email', $request->cliente)
-            ->orWhere('numero_cliente', $request->cliente)->first();
+            ->orWhere('numero_cliente', $request->cliente)
+            ->orderBy('s.id', 'asc')
+            ->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) return response()->json([
             'status' => "error",
@@ -32,13 +34,15 @@ class authService
 
         if ($activeTokens >= 2)  $user->tokens()->orderBy('created_at', 'asc')->first()->delete();
 
-        $tokenName = $request['cliente'];
+        //$tokenName = $request['cliente'];
+        $tokenName = $user->numero_cliente;
         $token = $user->createToken($tokenName)->plainTextToken;
 
         return response()->json([
             "status" => 'success',
             "message" => "Usuario autenticado",
-            "token" => $token
+            "token" => $token,
+            "numero_cliente" => $user->numero_cliente
         ], 200);
     }
 }
