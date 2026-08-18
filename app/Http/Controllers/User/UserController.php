@@ -109,9 +109,14 @@ class UserController extends Controller
                 'numero_cliente' => $numero,
             ], 200);
         } catch (\Exception $e) {
+            Log::error('Error al obtener el cliente', [
+                'numero_cliente' => $numero,
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
             return response()->json([
                 'message' => 'Error al obtener el cliente',
-                'error' => $e->getMessage()
+                //'error' => $e->getMessage()
             ], 500);
         }
     }
@@ -151,7 +156,7 @@ class UserController extends Controller
     }
 
     //actualizar email desde la api
-    public function updateEmail(Request $request)
+    /*public function updateEmail(Request $request)
     {
         try {
             return $this->validarService->updateEmail($request->numero_cliente);
@@ -161,7 +166,7 @@ class UserController extends Controller
                 'mensaje' => 'Error al obtener datos de clientes. ' . $th->getMessage(),
             ], 500);
         }
-    }
+    }*/
 
     public function destroy()
     {

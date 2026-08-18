@@ -135,7 +135,7 @@ class clientesService
         if (!$verificacion) return response()->json([
             "status" => "error",
             'message' => 'Código incorrecto.'
-        ], 400);
+        ], 422);
 
         if ($verificacion->isExpired()) return response()->json([
             "status" => "error",

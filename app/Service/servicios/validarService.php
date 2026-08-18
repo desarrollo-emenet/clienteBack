@@ -81,7 +81,7 @@ class validarService
         return null;
     }
 
-    public function updateEmail(string $numeroCliente)
+    /*public function updateEmail(string $numeroCliente)
     {
         $validacion = $this->validarClienteCompleto($numeroCliente);
 
@@ -118,5 +118,5 @@ class validarService
             'message' => 'Correo actualizado correctamente.',
             'email' => $nuevoEmail
         ]);
-    }
+    }*/
 }
