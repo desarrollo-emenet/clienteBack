@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\users\storeRequest;
+use Illuminate\Support\Facades\Auth;
 use Throwable;
 
 
@@ -77,13 +78,10 @@ class UserController extends Controller
     //obtener datos de un cliente por su numero de cliente
     public function clientePorNumero(Request $request, String $numero)
     {
-        $user = $request->user();
-        if (! $user) {
-            return response()->json(['message' => 'No autenticado'], 401);
-        }
 
         try {
             // Verificar que el numero_cliente pertenece al usuario
+            $user = Auth::user();
             $servicio = Service::where('numero_cliente', $numero)
                 ->where('user_id', $user->id)
                 ->first();
@@ -100,13 +98,12 @@ class UserController extends Controller
                 return $datosCliente; // Retornar error si hubo problema al obtener datos
             }
 
-            $clienteData = $datosCliente;
-
             // devolver info local y externa
             return response()->json([
-                'servicio' => $servicio,
-                'cliente' => $clienteData,
-                'numero_cliente' => $numero,
+                //'servicio' => $servicio,
+                'cliente' => $datosCliente["cliente"],
+                'servicios' => $datosCliente["servicios"],
+                //'numero_cliente' => $numero,
             ], 200);
         } catch (\Exception $e) {
             Log::error('Error al obtener el cliente', [
