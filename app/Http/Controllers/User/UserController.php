@@ -13,8 +13,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\users\storeRequest;
+use App\Notifications\VerifyEmailNotification;
 use Illuminate\Support\Facades\Auth;
-use Throwable;
 
 
 //use Illuminate\Support\Facades\Log;
@@ -34,8 +34,9 @@ class UserController extends Controller
     }
 
     public static $rulesUpdate = [
+        'email' => 'nullable|email|max:50|unique:users,email,',
         'old_password' => 'required|string',
-        'password'  => 'required|string|min:8',
+        'password'  => 'nullable|string|min:8',
     ];
 
     public function index()
@@ -109,7 +110,7 @@ class UserController extends Controller
             Log::error('Error al obtener el cliente', [
                 'numero_cliente' => $numero,
                 'user_id' => $user->id,
-                'error' => $e->getMessage(),
+                //'error' => $e->getMessage(),
             ]);
             return response()->json([
                 'message' => 'Error al obtener el cliente',
@@ -121,49 +122,31 @@ class UserController extends Controller
     //actualizar contraseña
     public function update(Request $request, $id)
     {
-        $user = User::findOrFail($id);
-
         try {
             // Validar datos
-            $validated = $request->validate((self::$rulesUpdate));
+            $validated = $request->validate([
+            'email' => [
+                'nullable',
+                'email',
+                'max:50',
+                'unique:users,email,' . $id,
+            ],
+            'old_password' => 'required|string',
+            'password' => 'nullable|string|min:8',
+        ]);
 
-            // Verificar la contraseña actual antes de permitir la actualización
-            $oldPassword = $validated['old_password'];
-            if (!Hash::check($oldPassword, $user->password)) {
-                return response()->json([
-                    'message' => 'Contraseña actual incorrecta',
-                ], 403);
-            }
+            $user = User::findOrFail($id);
+            DB::beginTransaction();
 
-            //encriptar nueva contraseña temporal y actualizar el usuario
-            $user->password = Hash::make($validated['password']);
-            $user->save();
-
-            // Devolver el usuario actualizado
-            return response()->json([
-                'mensaje' => 'Registro Actualizado',
-                'data'    => $user->fresh(),
-            ]);
+            return $this->userService->update($user, $validated);
         } catch (\Exception $e) {
+            DB::rollback();
             return response()->json([
-                'message' => 'Error al actualizar la contraseña',
-                'error' => $e->getMessage()
-            ], 404);
-        }
-    }
-
-    //actualizar email desde la api
-    /*public function updateEmail(Request $request)
-    {
-        try {
-            return $this->validarService->updateEmail($request->numero_cliente);
-        } catch (Throwable $th) {
-            return response()->json([
-                'status' => 'error',
-                'mensaje' => 'Error al obtener datos de clientes. ' . $th->getMessage(),
+                'message' => 'Error al actualizar los datos',
+                //'error' => $e->getMessage()
             ], 500);
         }
-    }*/
+    }
 
     public function destroy()
     {

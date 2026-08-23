@@ -15,9 +15,9 @@ class User extends Authenticatable implements MustVerifyEmail
 
 
     public function sendEmailVerificationNotification()
-{
-    $this->notify(new VerifyEmailNotification($this->passwordTemporal));
-}
+    {
+        $this->notify(new VerifyEmailNotification($this->passwordTemporal));
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -52,9 +52,9 @@ class User extends Authenticatable implements MustVerifyEmail
 
 
     public function servicios()
-{
-    return $this->hasMany(Service::class);
-}
+    {
+        return $this->hasMany(Service::class);
+    }
 
     public function serviceVerifications()
     {
@@ -62,9 +62,19 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     public function clientMetadata()
-{
-    return $this->hasMany(ClientMetadata::class);
-}
+    {
+        return $this->hasMany(ClientMetadata::class);
+    }
 
+    public function routeNotificationForMail($notification)
+    {
+        if (
+            $notification instanceof VerifyEmailNotification &&
+            !empty($notification->emailNuevo)
+        ) {
+            return $notification->emailNuevo;
+        }
 
+        return $this->email;
+    }
 }

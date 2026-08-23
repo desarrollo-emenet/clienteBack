@@ -80,43 +80,4 @@ class validarService
         }
         return null;
     }
-
-    /*public function updateEmail(string $numeroCliente)
-    {
-        $validacion = $this->validarClienteCompleto($numeroCliente);
-
-        if ($validacion instanceof JsonResponse) {
-            return $validacion;
-        }
-
-        $nuevoEmail = $validacion['email'];
-
-        $user = User::select('users.*')
-            ->join('services', 'services.user_id', '=', 'users.id')
-            ->where('services.numero_cliente', $numeroCliente)
-            ->first();
-
-        if (!$user) {
-            return response()->json([
-                'message' => 'No existe un usuario asociado a este número de cliente.'
-            ], 404);
-        }
-
-        if ($user->email === $nuevoEmail) {
-            return response()->json([
-                'updated' => false,
-                'message' => 'El correo ya está actualizado.'
-            ]);
-        }
-
-        $user->update([
-            'email' => $nuevoEmail
-        ]);
-
-        return response()->json([
-            'updated' => true,
-            'message' => 'Correo actualizado correctamente.',
-            'email' => $nuevoEmail
-        ]);
-    }*/
 }

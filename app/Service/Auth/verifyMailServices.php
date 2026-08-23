@@ -20,12 +20,51 @@ class verifyMailServices
         // Buscar el usuario por ID
         $user = User::findOrFail($id);
 
+        $email = $request->input('email');
+
+        if (!$email) {
+            $email = $user->getEmailForVerification();
+        }
+
         // Verificar el hash
-        if (! hash_equals($hash, sha1($user->getEmailForVerification()))) {
+        if (! hash_equals($hash, sha1($email))) {
             return response()->json([
                 'message' => 'Enlace inválido'
             ], 403);
         }
+
+        //actualizacion de coorre
+
+        if ($email !== $user->email) {
+
+            // Verificar que el correo todavía esté disponible
+            $correoExiste = User::where('email', $email)
+                ->where('id', '!=', $user->id)
+                ->exists();
+
+            if ($correoExiste) {
+                return response()->json([
+                    'message' => 'El correo electrónico ya está registrado.'
+                ], 422);
+            }
+
+            Log::info('Actualizando correo del usuario',[
+                    'usuario' => $user->id,
+                    'correo_anterior' => $user->email,
+                    'correo_nuevo' => $email,
+                ]
+            );
+
+            // actualizamos
+            $user->email = $email;
+            $user->markEmailAsVerified();
+            $user->save();
+            event(new Verified($user));
+            return $this->redirectToFrontend($user);
+        }
+
+
+        //Sin actualizacion de correo
 
         Log::info('Verificando correo para el usuario: ' . $user->email);
 

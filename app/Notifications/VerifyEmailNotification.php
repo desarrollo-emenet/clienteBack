@@ -20,9 +20,12 @@ class VerifyEmailNotification extends Notification
      * @return void
      */
     public $passwordTemporal;
-    public function __construct($passwordTemporal)
+    public $emailNuevo;
+
+    public function __construct($passwordTemporal = null, $emailNuevo = null)
     {
         $this->passwordTemporal = $passwordTemporal;
+        $this->emailNuevo = $emailNuevo;
     }
 
     /**
@@ -40,12 +43,16 @@ class VerifyEmailNotification extends Notification
     {
         $expiration = Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60));
 
+
+        $email = $this->emailNuevo?? $notifiable->getEmailForVerification();
+
         return URL::temporarySignedRoute(
             'verification.verify',
             $expiration,
             [
                 'id'   => $notifiable->getKey(),
-                'hash' => sha1($notifiable->getEmailForVerification()),
+                'hash' => sha1($email),
+                'email' => $this->emailNuevo,
             ]
         );
     }
@@ -67,6 +74,7 @@ class VerifyEmailNotification extends Notification
                 'url'  => $url,
                 'user' => $notifiable,
                 'passwordTemporal' => $this->passwordTemporal,
+                'emailNuevo' => $this->emailNuevo,
 
             ]);
     }
