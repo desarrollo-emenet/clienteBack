@@ -22,7 +22,9 @@ class pdfController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Ocurrió un error al crear el informe en pdf'
+                'message' => 'Ocurrió un error al crear el informe en pdf',
+                "error" => $e->getMessage(),
+
             ], 500);
         }
     }

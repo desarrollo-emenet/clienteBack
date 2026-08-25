@@ -1,136 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Informe trimestral</title>
     <style>
-        {!! file_get_contents(resource_path('views/pdf/informe.css')) !!}    
+        {!! file_get_contents(resource_path('views/pdf/informe.css')) !!}
     </style>
 </head>
 
 <body>
-    @php
-        //variables
-        $cliente = $cliente ?? [];
-        $servicios = $servicios ?? [];
-        $estadoCuenta = $servicios['estadoCuenta'] ?? [];
-
-        //datos cliente
-        $numeroCliente = $cliente['cliente'] ?? 'N/A';
-        $nombreCliente = $cliente['nombre'] ?? 'N/A';
-        $direccion = $cliente['direccion'] ?? '';
-        $colonia = $cliente['colonia'] ?? '';
-        $municipio = $cliente['municipio'] ?? '';
-        $estado = $cliente['estado'] ?? '';
-        $correo = $cliente['correo'] ?? '';
-        $telefono = $cliente['telefono'] ?? '';
-        $plan = $cliente['nombrePlan'] ?? '';
-
-        //datos servicios
-        $internet = $servicios['internet'] ?? [];
-        $camaras = $servicios['camaras'] ?? [];
-        $telefonoServicio = $servicios['telefono'] ?? [];
-        $cuentaTv = $servicios['cuentaTv'] ?? [];
-
-        //servicios activo
-        $serviciosContratados = [];
-        if (!empty($internet)) {
-            $serviciosContratados[] = [
-                'tipo' => 'Internet',
-                'detalle' => $plan ?? 'Plan de Internet',
-                'cantidad' => 1,
-                'precio' => (float) ($internet['precio'] ?? 0),
-            ];
-        }
-
-        $cantidadCamaras = (int) ($camaras['canServicios'] ?? 0);
-        if ($cantidadCamaras > 0) {
-            $precioCamara = (float) ($camaras['precio'] ?? 0);
-            $serviciosContratados[] = [
-                'tipo' => 'Cámaras',
-                'detalle' => $cantidadCamaras . ' servicio(s)',
-                'cantidad' => $cantidadCamaras,
-                'precio' => $precioCamara,
-            ];
-        }
-
-        $cantidadTelefono = (int) ($telefonoServicio['canServicios'] ?? 0);
-        if ($cantidadTelefono > 0) {
-            $precioTelefono = (float) ($telefonoServicio['precio'] ?? 0);
-            $serviciosContratados[] = [
-                'tipo' => 'Telefonía',
-                'detalle' => $cantidadTelefono . ' línea(s)',
-                'cantidad' => $cantidadTelefono,
-                'precio' => $precioTelefono,
-            ];
-        }
-
-        $cantidadTv = (int) ($cuentasTv['canServicios'] ?? 0);
-        if ($cantidadTv > 0) {
-            $precioTv = (float) ($cuentasTv['precio'] ?? 0);
-            $serviciosContratados[] = [
-                'tipo' => 'TV',
-                'detalle' => $cantidadTv . ' servicio(s)',
-                'cantidad' => $cantidadTv,
-                'precio' => $precioTv,
-            ];
-        }
-
-        //total mensual
-        $totalServicios = collect($serviciosContratados)->sum(function ($servicio) {
-            return $servicio['cantidad'] * $servicio['precio'];
-        });
-
-        //servicios contratados total
-        $cantidadServicios = count($serviciosContratados);
-
-        //ultimos 3 meses
-        $ultimosTres = collect($estadoCuenta)
-            ->sortByDesc(function ($item) {
-                try {
-                    return \Carbon\Carbon::createFromFormat(
-                        'd-m-Y',
-                        $item['fechaEmision'] ?? '01-01-1900'
-                    )->timestamp;
-                } catch (\Throwable $e) {
-                    return 0;
-                }
-            })
-            ->take(3)->reverse()->values();
-
-        //deuda
-        $deuda = (float) ($cliente['deuda'] ?? 0);
-        $tieneDeuda = $deuda > 0;
-
-        //total trimestral
-        $totalTrimestral = $ultimosTres->sum(function ($item) {
-            return (float) ($item['importe'] ?? 0);
-        });
-
-        //meses con adeudo
-        $mesesAdeudo = 0;
-        if ($totalServicios > 0 && $deuda > 0) {
-            $division = $deuda / $totalServicios;
-            if (floor($division) == $division) {
-                $mesesAdeudo = (int) $division;
-            }
-        }
-
-        //fecha
-        $fechaEmision = now()->format('d/m/Y');
-
-        //periodo
-        $primerMes = $ultimosTres->first()['mensualidad'] ?? null;
-        $ultimoMes = $ultimosTres->last()['mensualidad'] ?? null;
-        $periodo = 'N/A';
-        if ($primerMes && $ultimoMes) {
-            $periodo = $primerMes;
-            if ($primerMes !== $ultimoMes) {
-                $periodo .= ' - ' . $ultimoMes;
-            }
-        }
-    @endphp
-
     <div class="header">
         <table class="header-table">
             <tr>
@@ -155,7 +34,7 @@
             <tr>
                 <td class="client-left">
                     <div class="client-label">Cliente</div>
-                    <div class="client-name">{{ ucwords(strtolower($nombreCliente)) }}</div>
+                    <div class="client-name">{{ ($nombreCliente) }}</div>
                     <div class="client-block">
                         <span class="client-label">Número de cliente:</span>
                         <span class="client-value cliente"><strong>{{ $numeroCliente }}</strong></span>
@@ -164,9 +43,9 @@
                     <div class="client-block">
                         <span class="client-label">Dirección:</span>
                         <span class="client-value">{{ ucwords(strtolower($direccion)) }}
-                            @if(ucwords(strtolower(($colonia)))), {{ ucwords(strtolower(($colonia))) }}@endif
-                            @if(ucwords(strtolower(($municipio)))), {{ ucwords(strtolower(($municipio))) }}@endif
-                            @if(ucwords(strtolower(($estado)))), {{ ucwords(strtolower(($estado))) }}@endif
+                            @if($colonia), {{ $colonia }}@endif
+                            @if($municipio), {{ $municipio }}@endif
+                            @if($estado), {{ $estado }}@endif
                         </span>
                     </div>
 
@@ -236,19 +115,24 @@
                         <tr>
                             <td>{{ $item['fechaEmision'] ?? 'N/A' }}</td>
                             <td>{{ $item['mensualidad'] ?? 'N/A' }}</td>
-                            <td class="amount">${{ number_format((float) ($item['importe'] ?? 0), 2) }}</td>
+                            <td class="amount">
+                                ${{ number_format((float) ($item['importe'] ?? 0), 2) }}
+                            </td>
                         </tr>
                     @endforeach
                     <tr class="history-total">
                         <td colspan="2" class="text-right">Total trimestral</td>
-                        <td class="amount">${{ number_format($totalTrimestral, 2) }}</td>
+                        <td class="amount">
+                            ${{ number_format($totalTrimestral, 2) }}
+                        </td>
                     </tr>
                 </tbody>
             </table>
         @else
+
             <div class="no-debt">
                 <div class="no-debt-title">Sin información</div>
-                <div class="no-debt-text">No hay información disponible para los últimos tres meses. </div>
+                <div class="no-debt-text">No hay información disponible para los últimos tres meses.</div>
             </div>
         @endif
     </div>
@@ -304,7 +188,7 @@
                 <td class="payment-cell">
                     <table class="payment-box">
                         <tr>
-                            <td colspan="2" class="payment-header">Sucursal bancaria · HSBC
+                            <td colspan="2" class="payment-header">Sucursal bancaria · HSBC </td>
                         </tr>
                         <tr>
                             <td class="payment-image">
