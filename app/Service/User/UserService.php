@@ -167,7 +167,7 @@ class UserService
 
         // Devolver el usuario actualizado
         return response()->json([
-            'mensaje' => 'Registro Actualizado correctamente',
+            'mensaje' => 'Contraseña actualizada correctamente',
             'email_verification_required' => false,
             'data'    => $user->fresh(),
         ], 200);
