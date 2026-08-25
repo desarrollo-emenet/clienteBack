@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\VerifyMailController;
 use App\Http\Controllers\servicios\ServiceController;
 use App\Http\Controllers\servicios\serviciosController;
 use App\Http\Controllers\User\PagoraliaController;
+use App\Http\Controllers\User\pdfController;
 use App\Http\Controllers\User\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -28,7 +29,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('auth/login', [authController::class, 'login']);
 
-route::middleware(['auth:sanctum'])->group(function (){
+route::middleware(['auth:sanctum'])->group(function () {
     Route::get('auth/logout', [authController::class, 'logout']);
 
 
@@ -36,8 +37,10 @@ route::middleware(['auth:sanctum'])->group(function (){
     Route::post('servicios/verificar', [serviciosController::class, 'confirmarServicio']);
     Route::get('verify-access-service/{numero}', [ServiceController::class, 'verificarAcceso']);
     Route::post('/pagoralia/orden-pago', [PagoraliaController::class, 'crearOrdenPagoralia']);
+    //ruta pdf
+    Route::get('/informe-pdf/{numero}', [pdfController::class, 'informePdf']);
 });
-    Route::post('/pagoralia/invoice', [PagoraliaController::class, 'desencriptarInvoice']);
+Route::post('/pagoralia/invoice', [PagoraliaController::class, 'desencriptarInvoice']);
 
 
 //Controlador de verificacion
@@ -52,7 +55,7 @@ Route::post('/email/verification-notification', function (Request $request) {
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 //rutas controlador usuario
-Route::apiResource('usuarios',UserController::class);
+Route::apiResource('usuarios', UserController::class);
 Route::middleware('auth:sanctum')->get('cliente/{numero}', [UserController::class, 'clientePorNumero']);
 Route::get('updateEmail', [UserController::class, 'updateEmail']);
 
@@ -62,5 +65,3 @@ Route::post('/recoveryPassword/verify-token', [RecoveryPasswordController::class
 Route::post('auth/recoverPassword', [RecoveryPasswordController::class,  'sendEmail']);
 Route::put('auth/updatePassword', [RecoveryPasswordController::class,  'updatePassword']);
 Route::post('/verify-token', [VerifyMailController::class, 'validarToken']);
-
-
