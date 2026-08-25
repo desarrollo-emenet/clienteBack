@@ -4,8 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Service\Pdf\pdfService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class pdfController extends Controller
 {
@@ -20,6 +19,7 @@ class pdfController extends Controller
         try {
             return $this->informepdf->informeTrimestral($numero);
         } catch (\Exception $e) {
+            Log::info($e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Ocurrió un error al crear el informe en pdf'

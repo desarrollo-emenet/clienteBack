@@ -3,22 +3,25 @@
 namespace App\Service\Pagos;
 
 use Illuminate\Support\Facades\Http;
-
+use Illuminate\Support\Facades\Log;
 class ApiPagoraliaService
 {
-    public static function peticionAPIPagoralia(array $data)
+    public static function peticionAPIPagoralia($request)
     {
-        //$web_key = env('API_PAGORALIA_WEB');
         $web_url = env('API_PAGORALIA');
-
+        $token = env("TOKEN_PAGORALIA");
         $peticion = Http::withHeaders([
             'Accept' => 'application/json',
-            //'x-web-key' => $web_key
+            'Authorization' => "Bearer $token",
         ])->withoutVerifying()
-            ->post($web_url, $data);
+            ->post($web_url, $request);
 
         if ($peticion->failed()) {
-            return []; // Retornar null para indicar error en la petición
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No se genero la referencia de pago.',
+                "error" => $peticion->body(),
+            ], 500);
         }
         return $peticion->json();
     }
