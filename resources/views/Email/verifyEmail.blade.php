@@ -69,7 +69,9 @@
                             </p>
 
                             <p style="margin:0 0 18px 0; color:#283142; font-size:14px; line-height:1.6;">
-                                Tu contraseña temporal es: <strong>{{ $passwordTemporal }}</strong>
+                                @if (!empty($passwordTemporal))
+                                    <p>Tu contraseña temporal es:</p><strong>{{ $passwordTemporal }}</strong>
+                                @endif
                             </p>
 
                             <p style="margin:0 0 18px 0; color:#5b6b7a; font-size:13px;">
