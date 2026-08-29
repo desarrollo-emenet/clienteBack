@@ -112,29 +112,35 @@ class UserService
         ], 201);
     }
 
-    public function update(User $user, array $data)
+    public function update(User $user, $data)
     {
         $email = $data['email'] ?? null;
         $password = $data['password'] ?? null;
 
         //verificar que haya algun dato
-        if (empty($email) && empty($password)) {
-            return response()->json([
-                'mensaje' => 'Debes proporcionar un nuevo correo o una nueva contraseña'
-            ], 422);
-        }
+        if (empty($email) && empty($password)) return response()->json([
+            "status" => "error",
+            'message' => 'Debes proporcionar un nuevo correo o una nueva contraseña.'
+        ], 422);
 
-        // Verificar la contraseña actual 
+        // Verificar la contraseña actual
         $oldPassword = $data['old_password'];
-        if (!Hash::check($oldPassword, $user->password)) {
-            return response()->json([
-                'message' => 'Contraseña actual incorrecta',
-            ], 403);
-        }
+        if (!Hash::check($oldPassword, $user->password)) return response()->json([
+            "status" => "error",
+            'message' => 'Contraseña actual incorrecta.'
+        ], 403);
 
         //update password
         if (!empty($password)) {
             $user->password = Hash::make($password);
+            //si solo se cambia contraseña
+            $user->save();
+            DB::commit();
+            return response()->json([
+                'mensaje' => 'Contraseña actualizada correctamente',
+                'email_verification_required' => false,
+                'data'    => $user->fresh(),
+            ], 200);
         }
 
         //update email
@@ -150,8 +156,6 @@ class UserService
             $user->notify(new VerifyEmailNotification(null, $email));
             $user->save();
             DB::commit();
-
-
             return response()->json([
                 'mensaje' =>
                 'Se ha enviado un enlace de verificación al nuevo correo.',
@@ -159,17 +163,5 @@ class UserService
                 'data' => $user->fresh(),
             ], 200);
         }
-
-        //si solo se cambia contraseña
-        $user->save();
-        DB::commit();
-
-
-        // Devolver el usuario actualizado
-        return response()->json([
-            'mensaje' => 'Contraseña actualizada correctamente',
-            'email_verification_required' => false,
-            'data'    => $user->fresh(),
-        ], 200);
     }
 }

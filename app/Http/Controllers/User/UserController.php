@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\users\storeRequest;
+use App\Http\Requests\users\updateRequest;
 use App\Notifications\VerifyEmailNotification;
 use Illuminate\Support\Facades\Auth;
 
@@ -120,36 +121,18 @@ class UserController extends Controller
     }
 
     //actualizar contraseña
-    public function update(Request $request, $id)
+    public function update(updateRequest $request, $id)
     {
         try {
-            // Validar datos
-            $validated = $request->validate([
-            'email' => [
-                'nullable',
-                'email',
-                'max:50',
-                'unique:users,email,' . $id,
-            ],
-            'old_password' => 'required|string',
-            'password' => 'nullable|string|min:8',
-        ]);
-
-            $user = User::findOrFail($id);
             DB::beginTransaction();
-
-            return $this->userService->update($user, $validated);
+            $user = User::findOrFail($id);
+            return $this->userService->update($user, $request);
         } catch (\Exception $e) {
             DB::rollback();
             return response()->json([
-                'message' => 'Error al actualizar los datos',
-                //'error' => $e->getMessage()
+                'message' => 'Error al actualizar la informacion',
+                'error'   => $e->getMessage(),
             ], 500);
         }
-    }
-
-    public function destroy()
-    {
-        //
     }
 }
