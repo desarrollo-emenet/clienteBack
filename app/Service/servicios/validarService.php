@@ -61,7 +61,7 @@ class validarService
         // Extraer el email del clienteData
         //$email = $clienteData['cliente']['email'] ?? null;
 
-        $email = "crismart12ne@gmail.com"; // Email fijo para pruebas
+        $email = "mcid653@gmail.com"; // Email fijo para pruebas
 
         if (!filter_var(trim($email), FILTER_VALIDATE_EMAIL)) return response()->json([
             'success' => "error",
