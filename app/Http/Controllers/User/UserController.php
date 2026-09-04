@@ -10,11 +10,9 @@ use App\Service\servicios\validarService;
 use App\Http\Controllers\Controller;
 use App\Service\User\metadataService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\users\storeRequest;
 use App\Http\Requests\users\updateRequest;
-use App\Notifications\VerifyEmailNotification;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -53,16 +51,6 @@ class UserController extends Controller
     //Crear cuenta
     public function store(storeRequest $request)
     {
-
-
-        /*$correoExistente = $this->validarService->validarCorreoDisponible($email);
-        if ($correoExistente instanceof \Illuminate\Http\JsonResponse) {
-            Log::error('Error al validar correo: ' . $correoExistente->getContent());
-            return $correoExistente;
-        }*/
-
-        //log::info('correoExistente', ['data' => $correoExistente]);
-
         // Extraer datos validados
 
         try {

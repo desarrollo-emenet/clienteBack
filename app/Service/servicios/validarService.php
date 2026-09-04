@@ -59,9 +59,7 @@ class validarService
     public static function obtenerEmail(array $clienteData): string|JsonResponse
     {
         // Extraer el email del clienteData
-        //$email = $clienteData['cliente']['email'] ?? null;
-
-        $email = "mcid653@gmail.com"; // Email fijo para pruebas
+        $email = $clienteData['cliente']['email'] ?? null;
 
         if (!filter_var(trim($email), FILTER_VALIDATE_EMAIL)) return response()->json([
             'success' => "error",

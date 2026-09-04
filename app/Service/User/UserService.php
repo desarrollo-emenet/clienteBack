@@ -39,17 +39,14 @@ class UserService
         }
 
         $email = $validacion['email']; // Extraer el email del cliente validado
-        //Validar si existe el numero de cliente
         $serviceExistente = Service::where('numero_cliente', $numeroCliente)->first();
+        
+        $correoExistente = $this->validarService->validarCorreoDisponible($email);
+        if ($correoExistente instanceof \Illuminate\Http\JsonResponse) {
+            Log::error('Error al validar correo: ' . $correoExistente->getContent());
+            return $correoExistente;
+        }
         //log::info('existeCliente', ['numeroCliente' => $numeroCliente, 'email' => $email]);
-
-        //si existe, revisa si esta verificado el email sino reenvia correo
-        /*if ($serviceExistente) {
-            return $this->esVerificado($serviceExistente, $email);
-        }*/
-
-        //si no existe, crear cliente
-        //return $this->crearCliente($numeroCliente, $email);
 
         if ($serviceExistente) {
             return $this->esVerificado($serviceExistente, $email);
