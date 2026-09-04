@@ -21,11 +21,13 @@ class VerifyEmailNotification extends Notification
      */
     public $passwordTemporal;
     public $emailNuevo;
+    public $type;
 
-    public function __construct($passwordTemporal = null, $emailNuevo = null)
+    public function __construct($passwordTemporal = null, $emailNuevo = null, $type = null)
     {
         $this->passwordTemporal = $passwordTemporal;
         $this->emailNuevo = $emailNuevo;
+        $this->type = $type;
     }
 
     /**
@@ -45,6 +47,7 @@ class VerifyEmailNotification extends Notification
 
 
         $email = $this->emailNuevo?? $notifiable->getEmailForVerification();
+        
 
         return URL::temporarySignedRoute(
             'verification.verify',
@@ -53,6 +56,7 @@ class VerifyEmailNotification extends Notification
                 'id'   => $notifiable->getKey(),
                 'hash' => sha1($email),
                 'email' => $this->emailNuevo,
+                'type' => $this->type,
             ]
         );
     }
@@ -75,7 +79,6 @@ class VerifyEmailNotification extends Notification
                 'user' => $notifiable,
                 'passwordTemporal' => $this->passwordTemporal,
                 'emailNuevo' => $this->emailNuevo,
-
             ]);
     }
 

@@ -104,7 +104,7 @@ class UserService
         ]);
 
         //Evento de registro
-        $user->notify(new VerifyEmailNotification($passwordTemporal));
+        $user->notify(new VerifyEmailNotification($passwordTemporal,null,'create_account'));
         DB::commit();
         return response()->json([
             'mensaje' => 'Registro creado correctamente',
@@ -153,8 +153,9 @@ class UserService
             }
 
             //actualizar corre hasta que se confirme el correo
-            $user->notify(new VerifyEmailNotification(null, $email));
-            $user->save();
+            $user->notify(new VerifyEmailNotification(null, $email, 'update_account'));
+
+            //$user->save();
             DB::commit();
             return response()->json([
                 'mensaje' =>

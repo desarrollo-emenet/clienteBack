@@ -19,8 +19,8 @@ class verifyMailServices
     {
         // Buscar el usuario por ID
         $user = User::findOrFail($id);
-
         $email = $request->input('email');
+        $type = $request->input('type');
 
         if (!$email) {
             $email = $user->getEmailForVerification();
@@ -48,7 +48,9 @@ class verifyMailServices
                 ], 422);
             }
 
-            Log::info('Actualizando correo del usuario',[
+            Log::info(
+                'Actualizando correo del usuario',
+                [
                     'usuario' => $user->id,
                     'correo_anterior' => $user->email,
                     'correo_nuevo' => $email,
@@ -60,13 +62,13 @@ class verifyMailServices
             $user->markEmailAsVerified();
             $user->save();
             event(new Verified($user));
+
+            if ($type === 'update_account') {
+                $user->tokens()->delete();
+            }
+
             return $this->redirectToFrontend($user);
         }
-
-
-        //Sin actualizacion de correo
-
-        Log::info('Verificando correo para el usuario: ' . $user->email);
 
         // Verificar si el correo ya ha sido verificado
         if ($user->hasVerifiedEmail()) {
@@ -77,7 +79,7 @@ class verifyMailServices
 
         $user->markEmailAsVerified();
         event(new Verified($user));
-        Log::info('es verificado: ' . ($user->hasVerifiedEmail() ? 'Sí' : 'No'));
+        //Log::info('es verificado: ' . ($user->hasVerifiedEmail() ? 'Sí' : 'No'));
 
         return $this->redirectToFrontend($user);
     }
@@ -89,7 +91,7 @@ class verifyMailServices
 
         $this->token = Str::random(64);
         Cache::put("email_verified_{$this->token}", $user->id, now()->addMinutes(5));
-        Log::info('Token almacenado en la caché: ' . $this->token);
+        //Log::info('Token almacenado en la caché: ' . $this->token);
         return redirect($this->urlFrontend . '/email-verificado?token=' . urlencode($this->token));
     }
 
@@ -99,14 +101,14 @@ class verifyMailServices
     {
         // Obtener el token de la solicitud
         $token = $request->input('token');
-        Log::info('Token recibido: ' . $token);
+        //Log::info('Token recibido: ' . $token);
 
         // Verificar si el token existe en la caché
         if (!$token) {
             return response()->json(['valid' => false], 400);
         }
 
-        Log::info('Verificando token en la caché: ' . $token);
+        //Log::info('Verificando token en la caché: ' . $token);
         // Buscar el token en la caché
         $userId = Cache::get("email_verified_{$token}");
 
