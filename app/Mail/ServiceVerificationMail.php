@@ -45,7 +45,7 @@ class ServiceVerificationMail extends Mailable
     public function content()
     {
         return new Content(
-            view: 'email.verificarServicio', // vista blade
+            view: 'Email.verificarServicio', // vista blade
             with: [
                 'codigo' => $this->codigo,
             ]

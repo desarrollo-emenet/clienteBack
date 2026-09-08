@@ -53,7 +53,7 @@ class RecoverPasswordMail extends Mailable
     public function content(): Content
     {
      return new Content(
-            view: 'email.passwordRecover', // vista blade
+            view: 'Email.passwordRecover', // vista blade
             with: [
                 'token' => $this->token,
                 'url'   => $this->url,

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width">
@@ -50,7 +49,7 @@
                     <!-- Header -->
                     <tr>
                         <td>
-                            <img src="{{ $message->embed(public_path('img/emenetLogo.png')) }}" alt="Logo Emenet"
+                            <img src="{{ $message->embed(public_path('img/emenetLogo.png')) }}" alt="Logo "
                                 width="150" style="max-width: 200px; height: auto; display: block; margin: 0 auto;" />
 
                         </td>
@@ -64,7 +63,7 @@
                                 de Correo</h2>
 
                             <p style="margin:0 0 18px 0; color:#283142; font-size:14px; line-height:1.6;">
-                                Confirma el correo registrado a tu cuenta de<strong> EMENET Comunicaciones</strong>,
+                                Confirma el correo registrado a tu cuenta de<strong> emenet Comunicaciones</strong>,
                                 para continuar haz click en el siguiente enlace
                             </p>
 
@@ -133,7 +132,7 @@
                     <tr>
                         <td
                             style="padding:18px 32px 28px 32px; text-align:center;background: lightgray; font-size:12px;">
-                            © {{ date('Y') }} EMENET Comunicaciones. Todos los derechos reservados.<br>
+                            © {{ date('Y') }} emenet Comunicaciones. Todos los derechos reservados.<br>
                             <div style="margin-top:8px; font-size:11px;">
                                 No compartas informacion personal
                             </div>

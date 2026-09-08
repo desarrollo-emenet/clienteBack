@@ -128,7 +128,7 @@
                     <tr>
                         <td
                             style="padding:18px 32px 28px 32px; text-align:center; background:lightgray; font-size:12px;">
-                            © {{ date('Y') }} EMENET Comunicaciones. Todos los derechos reservados.<br>
+                            © {{ date('Y') }} emenet Comunicaciones. Todos los derechos reservados.<br>
                             <div style="margin-top:8px; font-size:11px;">
                                 No compartas información personal
                             </div>

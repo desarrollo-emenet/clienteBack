@@ -131,7 +131,7 @@ class recoveryService
         $user->update(['password' => Hash::make($request->password)]);
         DB::table('password_resets')->where('email', $token->email)->delete();
 
-        DB::commit();
+       // DB::commit();
         return response()->json([
             "status" => "success",
             "message" => "Contraseña actualizada correctamente."

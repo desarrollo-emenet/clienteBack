@@ -37,7 +37,6 @@ class clientesService
         $clientesData = [];
         foreach ($servicios as $servicio) {
             // Obtener datos del cliente usando el número de cliente encriptado
-            //$cliente = consultaApiService::peticionAPI((string) $servicio->numero_cliente, 'false');  -------------------------------
             $cliente = $this->metadataService->getMetadataForCliente((string) $servicio->numero_cliente, $user);
             if ($cliente) {
                 $cliente['idServicio'] = $servicio->id;
@@ -53,7 +52,7 @@ class clientesService
     public function store(Request $request)
     {
         $validacion = $this->validarService->validarClienteCompleto($request->numero_cliente);
-        Log::info('validacion', ['data' => $validacion]);
+        //Log::info('validacion', ['data' => $validacion]);
         if ($validacion instanceof JsonResponse) return $validacion; // Retornar error si hubo problema en validación
 
         // Extraer datos validados
