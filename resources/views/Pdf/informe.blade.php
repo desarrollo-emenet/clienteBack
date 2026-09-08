@@ -14,7 +14,7 @@
         <table class="header-table">
             <tr>
                 <td class="logo">
-                    <img src="http://localhost:4200/assets/img/emenetLogo.png">
+                    <img src="https://clientes.emenet.mx/assets/img/emenetLogo.png">
                 </td>
                 <td class="header-info">
                     <div class="header-title">Informe trimestral</div>
@@ -58,7 +58,7 @@
                 </td>
 
                 <td class="payment-barcode">
-                    <img src="http://localhost:4200/assets/img/FormasPago/barcode.webp" class="barcode">
+                    <img src="https://clientes.emenet.mx/assets/img/FormasPago/barcode.webp" class="barcode">
                 </td>
             </tr>
         </table>
@@ -192,7 +192,7 @@
                         </tr>
                         <tr>
                             <td class="payment-image">
-                                <img src="http://localhost:4200/assets/img/FormasPago/hsbc.webp" class="payment-logo">
+                                <img src="https://clientes.emenet.mx/assets/img/FormasPago/hsbc.webp" class="payment-logo">
                             </td>
                             <td class="payment-info">
                                 <div class="payment-body">
@@ -218,7 +218,7 @@
                         </tr>
                         <tr>
                             <td class="payment-image">
-                                <img src="http://localhost:4200/assets/img/FormasPago/spei.webp" class="payment-logo">
+                                <img src="https://clientes.emenet.mx/assets/img/FormasPago/spei.webp" class="payment-logo">
                             </td>
                             <td class="payment-info">
                                 <div class="payment-body">
@@ -246,7 +246,7 @@
             </tr>
             <tr>
                 <td class="oxxo-image">
-                    <img src="http://localhost:4200/assets/img/FormasPago/oxxo.webp" class="oxxo-logo">
+                    <img src="https://clientes.emenet.mx/assets/img/FormasPago/oxxo.webp" class="oxxo-logo">
                 </td>
                 <td class="oxxo-info">
                     <div class="oxxo-body">
