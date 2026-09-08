@@ -10,7 +10,6 @@ use App\Service\servicios\validarService;
 use App\Http\Controllers\Controller;
 use App\Service\User\metadataService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use App\Http\Requests\users\storeRequest;
 use App\Http\Requests\users\updateRequest;
 use Illuminate\Support\Facades\Auth;
@@ -51,8 +50,6 @@ class UserController extends Controller
     //Crear cuenta
     public function store(storeRequest $request)
     {
-        // Extraer datos validados
-
         try {
             DB::beginTransaction();
             return $this->userService->existeCliente($request->numero_cliente);
@@ -60,8 +57,8 @@ class UserController extends Controller
             DB::rollback();
             return response()->json([
                 'message' => 'Error al crear la cuenta',
-                'error'   => $e->getMessage(),
-            ]);
+                //'error'   => $e->getMessage(),
+            ],500);
         }
     }
 
@@ -84,7 +81,7 @@ class UserController extends Controller
             $datosCliente = $this->metadataService->getMetadataForCliente($numero, $user);
 
             if ($datosCliente instanceof \Illuminate\Http\JsonResponse) {
-                Log::error('Error al obtener datos del cliente: ' . $datosCliente->getContent());
+                //Log::error('Error al obtener datos del cliente: ' . $datosCliente->getContent());
                 return $datosCliente; // Retornar error si hubo problema al obtener datos
             }
 
@@ -96,11 +93,6 @@ class UserController extends Controller
                 //'numero_cliente' => $numero,
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error al obtener el cliente', [
-                'numero_cliente' => $numero,
-                'user_id' => $user->id,
-                //'error' => $e->getMessage(),
-            ]);
             return response()->json([
                 'message' => 'Error al obtener el cliente',
                 //'error' => $e->getMessage()
@@ -119,7 +111,7 @@ class UserController extends Controller
             DB::rollback();
             return response()->json([
                 'message' => 'Error al actualizar la informacion',
-                'error'   => $e->getMessage(),
+                //'error'   => $e->getMessage(),
             ], 500);
         }
     }

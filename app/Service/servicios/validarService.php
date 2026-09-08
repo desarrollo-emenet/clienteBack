@@ -3,7 +3,6 @@
 namespace App\Service\servicios;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class validarService
@@ -25,7 +24,7 @@ class validarService
 
 
         $clienteEmail = $this->obtenerEmail($clienteData);
-        Log::info('clienteEmail en valida cliente', ['email' => $clienteEmail]);
+        //Log::info('clienteEmail en valida cliente', ['email' => $clienteEmail]);
         if ($clienteEmail instanceof JsonResponse) return $clienteEmail; // Error al obtener email
 
         // retornar datos
@@ -59,11 +58,9 @@ class validarService
 
     public static function obtenerEmail(array $clienteData): string|JsonResponse
     {
-        // Extraer el email del clienteData
-        //Log::info('obtenerEmail', ['clienteData' => $clienteData]);
         $email = $clienteData['cliente']['correo'] ?? null;
 
-        //Log::info('obtenerEmail', ['email' => $email]);
+        //$email = 'crismart12ne@gmail.com';
 
         if (!filter_var(trim($email), FILTER_VALIDATE_EMAIL)) return response()->json([
             'success' => "error",

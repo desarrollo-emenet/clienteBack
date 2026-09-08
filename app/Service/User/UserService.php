@@ -108,7 +108,7 @@ class UserService
             'user'    => $user,
         ], 201);
     }
-
+ 
     public function update(User $user, $data)
     {
         $email = $data['email'] ?? null;
