@@ -21,7 +21,7 @@ return [
 
     'allowed_origins' => ['*'],
 
-    'allowed_origins_patterns' => ['https://dev-clientes.emenet.mx', 'http://localhost:4200'],
+    'allowed_origins_patterns' => ['https://mi.emenet.mx', 'http://localhost:4200'],
 
     'allowed_headers' => ['*'],
 
