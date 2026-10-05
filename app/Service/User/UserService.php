@@ -162,4 +162,15 @@ class UserService
             ], 200);
         }
     }
+
+    public function updateAvatar(User $user, string $avatarUrl)
+    {
+        $user->avatar_url = $avatarUrl;
+        $user->save();
+        return response()->json([
+            'mensaje' => 'Avatar actualizado correctamente',
+            'data'    => $user->fresh(),
+        ], 200);
+        
+    }
 }

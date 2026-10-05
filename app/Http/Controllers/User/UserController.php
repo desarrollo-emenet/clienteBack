@@ -58,7 +58,7 @@ class UserController extends Controller
             return response()->json([
                 'message' => 'Error al crear la cuenta',
                 //'error'   => $e->getMessage(),
-            ],500);
+            ], 500);
         }
     }
 
@@ -111,6 +111,23 @@ class UserController extends Controller
             DB::rollback();
             return response()->json([
                 'message' => 'Error al actualizar la informacion',
+                //'error'   => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function updateAvatar(Request $request)
+    {
+        try {
+            $request->validate([
+                'avatar_url' => ['required', 'url', 'max:500'],
+            ]);
+
+            $user = auth()->user();
+            return $this->userService->updateAvatar( $user, $request->avatar_url );
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al actualizar el avatar',
                 //'error'   => $e->getMessage(),
             ], 500);
         }

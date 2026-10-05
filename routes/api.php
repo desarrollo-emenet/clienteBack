@@ -39,6 +39,8 @@ route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/pagoralia/orden-pago', [PagoraliaController::class, 'crearOrdenPagoralia']);
     //ruta pdf
     Route::get('/informe-pdf/{numero}', [pdfController::class, 'informePdf']);
+    Route::put('updateAvatar', [UserController::class, 'updateAvatar']);
+
 });
 Route::post('/pagoralia/invoice', [PagoraliaController::class, 'desencriptarInvoice']);
 
@@ -57,7 +59,7 @@ Route::post('/email/verification-notification', function (Request $request) {
 //rutas controlador usuario
 Route::apiResource('usuarios', UserController::class);
 Route::middleware('auth:sanctum')->get('cliente/{numero}', [UserController::class, 'clientePorNumero']);
-Route::get('updateEmail', [UserController::class, 'updateEmail']);
+
 
 
 //rutas de recuperacion de contraseña
