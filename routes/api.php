@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\RecoveryPasswordController;
 use App\Http\Controllers\Auth\VerifyMailController;
 use App\Http\Controllers\servicios\ServiceController;
 use App\Http\Controllers\servicios\serviciosController;
+use App\Http\Controllers\User\DeviceTokenController;
 use App\Http\Controllers\User\PagoraliaController;
 use App\Http\Controllers\User\pdfController;
 use App\Http\Controllers\User\UserController;
@@ -40,6 +41,9 @@ route::middleware(['auth:sanctum'])->group(function () {
     //ruta pdf
     Route::get('/informe-pdf/{numero}', [pdfController::class, 'informePdf']);
     Route::put('updateAvatar', [UserController::class, 'updateAvatar']);
+
+    Route::post('/devices/save-token-noti', [DeviceTokenController::class, 'saveTokenNoti']);
+
 
 });
 Route::post('/pagoralia/invoice', [PagoraliaController::class, 'desencriptarInvoice']);
