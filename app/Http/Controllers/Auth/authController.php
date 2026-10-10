@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Service\Auth\authService;
 use App\Http\Requests\auth\loginRequest;
+use App\Models\UserDevicesToken;
+use Illuminate\Http\Request;
 use Throwable;
 
 class authController extends Controller
@@ -35,6 +37,31 @@ class authController extends Controller
             // $request->user()->tokens()->delete(); borrar todos los token creados del usuario autenticado
             auth('sanctum')->user()->currentAccessToken()->delete();
             auth('sanctum')->user()->tokens()->delete();
+            return response()->json([
+                'status' => 'error',
+                "mensaje" => "Cierre de sesión exitoso"
+            ], 200);
+        } catch (Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'mensaje' => 'Ocurrió un error al obtener la información. ' . $th->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function logout1(Request $request)
+    {
+        $request->validate([
+            'fmc_token' => 'required|string',
+        ]);
+
+        try {
+            // $request->user()->tokens()->delete(); borrar todos los token creados del usuario autenticado
+            UserDevicesToken::where('fcm_token', $request->fmc_token)->delete();
+
+            auth('sanctum')->user()->currentAccessToken()->delete();
+            auth('sanctum')->user()->tokens()->delete();
+
             return response()->json([
                 'status' => 'error',
                 "mensaje" => "Cierre de sesión exitoso"
