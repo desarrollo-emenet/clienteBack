@@ -28,7 +28,6 @@ class NotificacionPushController extends Controller
 
         Log::info('Token recibido desde Angular:', $request->all());
 
-
         $device = UserDevicesToken::updateOrCreate(
             ['fcm_token' => $request->fcm_token],
             [
@@ -44,6 +43,20 @@ class NotificacionPushController extends Controller
         ], 200);
     }
 
+    public function deleteTokenNotifi(Request $request){
+        $request->validate([
+            'fcm_token' => 'required|string',
+        ]);
+
+        UserDevicesToken::where('user_id', Auth::id())
+        ->where('fcm_token', $request->fcm_token)
+        ->delete();
+
+        return response()->json([
+            'success'=> true,
+            'message' => 'token desvinculado correctamente',
+        ], 200);
+    }
 
     /*public function testPushNotification(Request $request, notifiService $fcmService)
     {

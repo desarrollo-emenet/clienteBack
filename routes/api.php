@@ -43,7 +43,7 @@ route::middleware(['auth:sanctum'])->group(function () {
     Route::put('updateAvatar', [UserController::class, 'updateAvatar']);
 
     Route::post('/devices/save-token-noti', [NotificacionPushController::class, 'saveTokenNoti']);
-
+    Route::delete('/devices/delete-token-noti', [NotificacionPushController::class, 'deleteTokenNoti']);
 
 });
 

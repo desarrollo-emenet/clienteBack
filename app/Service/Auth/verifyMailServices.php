@@ -5,6 +5,7 @@ namespace App\Service\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Verified;
 use App\Models\User;
+use App\Models\UserDevicesToken;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -65,6 +66,7 @@ class verifyMailServices
 
             if ($type === 'update_account') {
                 $user->tokens()->delete();
+                UserDevicesToken::where('user_id', $user->id)->delete();
             }
 
             return $this->redirectToFrontend($user);

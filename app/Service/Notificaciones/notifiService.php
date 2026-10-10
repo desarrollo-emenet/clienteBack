@@ -4,6 +4,8 @@ namespace App\Service\Notificaciones;
 
 use App\Models\UserDevicesToken;
 use Illuminate\Support\Facades\Log;
+use Kreait\Firebase\Exception\Messaging\InvalidArgument;
+use Kreait\Firebase\Exception\Messaging\NotFound;
 use Kreait\Firebase\Messaging;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification;
@@ -43,7 +45,7 @@ class notifiService
 
             try {
 
-            $message = CloudMessage::fromArray([
+                $message = CloudMessage::fromArray([
                     'token' => $token, // El target explícito que faltaba
                     'notification' => [
                         'title' => $title,
@@ -54,7 +56,11 @@ class notifiService
 
                 $this->messaging->send($message);
                 $exitos++;
-            } catch (\Kreait\Firebase\Exception\Messaging\InvalidArgument $e) {
+                
+            } catch (NotFound $e) {
+                UserDevicesToken::where('fcm_token', $token)->delete();
+                Log::info('Token FCM no registrado; se eliminó de la base de datos.');
+            } catch (InvalidArgument $e) {
                 UserDevicesToken::where('fcm_token', $token)->delete();
                 Log::info("Token inválido removido automáticamente de la base de datos." . $e->getMessage());
             } catch (\Exception $e) {

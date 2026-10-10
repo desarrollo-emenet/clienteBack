@@ -4,6 +4,7 @@ namespace App\Service\User;
 
 use App\Models\Service;
 use App\Models\User;
+use App\Models\UserDevicesToken;
 use App\Notifications\VerifyEmailNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -132,6 +133,8 @@ class UserService
             $user->password = Hash::make($password);
             //si solo se cambia contraseña
             $user->save();
+            $user->tokens()->delete();
+            UserDevicesToken::where('user_id', $user->id)->delete();
             DB::commit();
             return response()->json([
                 'mensaje' => 'Contraseña actualizada correctamente',
@@ -155,8 +158,7 @@ class UserService
             //$user->save();
             DB::commit();
             return response()->json([
-                'mensaje' =>
-                'Se ha enviado un enlace de verificación al nuevo correo.',
+                'mensaje' => 'Se ha enviado un enlace de verificación al nuevo correo.',
                 'email_verification_required' => true,
                 'data' => $user->fresh(),
             ], 200);
