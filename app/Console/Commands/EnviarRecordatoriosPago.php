@@ -29,6 +29,7 @@ class EnviarRecordatoriosPago extends Command
      *
      * @return int
      */
+
     public function handle(notifiService $notifiService): int
     {
         $tipo = $this->argument('tipo');
@@ -46,20 +47,21 @@ class EnviarRecordatoriosPago extends Command
         User::query()
             ->whereHas('clientMetadata')
             ->with('clientMetadata')
-            ->chunkById(100, function ($usuarios) use ($notifiService, $tipo, &$total, &$enviados) {
+            ->chunkById(100, function ($usuarios) use ( $notifiService, $tipo, &$total, &$enviados ) {
                 foreach ($usuarios as $usuario) {
                     $total++;
                     $servicios = [];
 
-                    foreach ($usuario->clientMetadata as $metadata) {
-                        $deuda = (float) data_get(
-                            $metadata->metadata,
-                            'cliente.deuda',
-                            0
-                        );
+                    foreach ($usuario->clientMetadata as $metadata) {                        
+                        $clasificacion = strtoupper(trim((string) data_get( $metadata->metadata, 'cliente.clasificacion', '' )));
 
-                        $numero = data_get($metadata->metadata, 'cliente.cliente', $metadata->numero_cliente);
-                        $nombre = data_get($metadata->metadata, 'cliente.nombre', 'Cliente');
+                        if ($clasificacion === 'BAJA') {
+                            continue;
+                        }
+
+                        $deuda = (float) data_get($metadata->metadata, 'cliente.deuda', 0 );
+                        $numero = data_get( $metadata->metadata, 'cliente.cliente', $metadata->numero_cliente );
+                        $nombre = data_get( $metadata->metadata, 'cliente.nombre', 'Cliente' );
 
                         $servicios[] = [
                             'numero' => $numero,
@@ -67,43 +69,34 @@ class EnviarRecordatoriosPago extends Command
                             'deuda' => max(0, $deuda),
                         ];
                     }
-                    $conDeuda = array_values(array_filter($servicios, fn($s) => $s['deuda'] > 0));
 
-                    // El recordatorio de deuda 
-                    if ($tipo === 'deuda' && empty($conDeuda)) {
-                        continue;
-                    }
+                    if (empty($servicios)) { continue; }
 
+                    $conDeuda = array_values(array_filter( $servicios, fn($s) => $s['deuda'] > 0 ));
+
+                    if ($tipo === 'deuda' && empty($conDeuda)) { continue; }
                     $nombre = $servicios[0]['nombre'] ?? 'Cliente';
 
-                    //recordatorio de pago del 1 al 5
                     if ($tipo === 'pago') {
                         $title = '¡Recuerda tu pago emenet!';
                         $body = "Hola {$nombre}, recuerda que las " .
-                            "fechas de pago son del 1 al 5 de cada mes .";
+                            "fechas de pago son del 1 al 5 de cada mes.";
                     } else {
-                        //recordatorio de clientes con adeudo
                         $cantidad = count($conDeuda);
-                        $totalDeuda = array_sum(array_column($conDeuda, 'deuda'));
+                        $totalDeuda = array_sum( array_column($conDeuda, 'deuda') );
+
                         $detalle = [];
 
-                        foreach ($servicios as $servicio) {
-                            $estado = $servicio['deuda'] > 0
-                                ? 'adeudo de $' . number_format(
-                                    $servicio['deuda'],
-                                    2
-                                )
-                                : 'sin adeudo';
-
-                            $detalle[] = "\n{$servicio['numero']}: {$estado}";
+                        foreach ($conDeuda as $servicio) {
+                            $detalle[] = "{$servicio['numero']}: adeudo de $" .
+                                number_format($servicio['deuda'], 2);
                         }
 
                         $title = '¡Tienes pagos pendientes!';
 
                         $body = "Hola {$nombre}, tienes {$cantidad} " .
                             "servicio(s) con adeudo por $" .
-                            number_format($totalDeuda, 2) . '. ' .
-                            implode('; ', $detalle);
+                            number_format($totalDeuda, 2) . '. ' . implode('; ', $detalle);
                     }
 
                     $enviado = $notifiService->enviarNotificacionPush(
@@ -115,18 +108,18 @@ class EnviarRecordatoriosPago extends Command
                                 ? 'recordatorio_pago'
                                 : 'deuda',
                         ]
-                        
                     );
 
-                    if ($enviado) {
+                    /*if ($enviado) {
                         $enviados++;
 
                         Log::info('Recordatorio EMENET enviado', [
                             'user_id' => $usuario->id,
                             'tipo' => $tipo,
+                            'servicios_activos' => count($servicios),
                             'servicios_con_deuda' => count($conDeuda),
                         ]);
-                    }
+                    }*/
                 }
             });
 

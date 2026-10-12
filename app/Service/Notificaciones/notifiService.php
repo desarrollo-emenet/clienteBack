@@ -42,16 +42,14 @@ class notifiService
 
         $messages = [];
         foreach ($tokens as $token) {
-
             try {
-
                 $message = CloudMessage::fromArray([
-                    'token' => $token, // El target explícito que faltaba
+                    'token' => $token, 
                     'notification' => [
                         'title' => $title,
                         'body'  => $body,
                     ],
-                    'data' => $extraData, // Los metadatos para Angular
+                    'data' => $extraData, 
                 ]);
 
                 $this->messaging->send($message);
