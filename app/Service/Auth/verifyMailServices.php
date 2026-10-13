@@ -49,14 +49,14 @@ class verifyMailServices
                 ], 422);
             }
 
-            Log::info(
+            /*Log::info(
                 'Actualizando correo del usuario',
                 [
                     'usuario' => $user->id,
                     'correo_anterior' => $user->email,
                     'correo_nuevo' => $email,
                 ]
-            );
+            );*/
 
             // actualizamos
             $user->email = $email;
@@ -74,7 +74,7 @@ class verifyMailServices
 
         // Verificar si el correo ya ha sido verificado
         if ($user->hasVerifiedEmail()) {
-            Log::info('El correo ya había sido verificado para el usuario: ' . $user->email);
+            //Log::info('El correo ya había sido verificado para el usuario: ' . $user->email);
             $this->urlFrontend = env('FRONTEND_URL_LOCAL');
             return redirect($this->urlFrontend . '/email-verificado?yaVerificado=true');
         }

@@ -25,8 +25,8 @@ class LimpiarRegistrosTemporales extends Command
                 Service::where('user_id', $user->id)->delete();
                 $user->delete();
             });
-            Log::info("Usuario {$user->id} -{$user->email} eliminado.");
-            $this->info("Usuario {$user->id} -{$user->email} eliminado.");
+            //Log::info("Usuario {$user->id} -{$user->email} eliminado.");
+            //$this->info("Usuario {$user->id} -{$user->email} eliminado.");
         }
 
         return self::SUCCESS;

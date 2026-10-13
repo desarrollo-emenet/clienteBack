@@ -34,7 +34,7 @@ class notifiService
         //obtener toquen de la base de datos
         $tokens = UserDevicesToken::where('user_id', $userId)->pluck('fcm_token')->toArray();
         if (empty($tokens)) {
-            Log::warning("No se encontraron dispositivos registrados para el usuario ID: {$userId}");
+            //Log::warning("No se encontraron dispositivos registrados para el usuario ID: {$userId}");
             return false;
         }
 
@@ -57,16 +57,16 @@ class notifiService
                 
             } catch (NotFound $e) {
                 UserDevicesToken::where('fcm_token', $token)->delete();
-                Log::info('Token FCM no registrado; se eliminó de la base de datos.');
+                //Log::info('Token FCM no registrado; se eliminó de la base de datos.');
             } catch (InvalidArgument $e) {
                 UserDevicesToken::where('fcm_token', $token)->delete();
-                Log::info("Token inválido removido automáticamente de la base de datos." . $e->getMessage());
+                //Log::info("Token inválido removido automáticamente de la base de datos." . $e->getMessage());
             } catch (\Exception $e) {
-                Log::error("Error enviando a un token específico: " . $e->getMessage());
-                Log::error("Error real de Firebase FCM: " . $e->getMessage());
+                //Log::error("Error enviando a un token específico: " . $e->getMessage());
+                //Log::error("Error real de Firebase FCM: " . $e->getMessage());
             }
         }
-        Log::info("Proceso de notificaciones terminado para usuario {$userId}. Exitosos: {$exitos} de " . count($tokens));
+        //Log::info("Proceso de notificaciones terminado para usuario {$userId}. Exitosos: {$exitos} de " . count($tokens));
 
         return $exitos > 0;
     }

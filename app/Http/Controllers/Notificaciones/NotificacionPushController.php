@@ -26,8 +26,6 @@ class NotificacionPushController extends Controller
             return response()->json(['message' => 'Usuario no autenticado'], 401);
         }
 
-        Log::info('Token recibido desde Angular:', $request->all());
-
         $device = UserDevicesToken::updateOrCreate(
             ['fcm_token' => $request->fcm_token],
             [

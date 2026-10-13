@@ -39,7 +39,7 @@ class EnviarRecordatoriosPago extends Command
             return Command::FAILURE;
         }
 
-        $this->info("Iniciando recordatorios: {$tipo}");
+        //$this->info("Iniciando recordatorios: {$tipo}");
 
         $total = 0;
         $enviados = 0;
@@ -123,8 +123,8 @@ class EnviarRecordatoriosPago extends Command
                 }
             });
 
-        $this->info("Usuarios revisados: {$total}");
-        $this->info("Usuarios notificados: {$enviados}");
+        //$this->info("Usuarios revisados: {$total}");
+        //$this->info("Usuarios notificados: {$enviados}");
 
         return Command::SUCCESS;
     }
