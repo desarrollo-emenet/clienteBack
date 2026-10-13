@@ -17,17 +17,17 @@ class Kernel extends ConsoleKernel
 
         //recordatorio general para todos los clientes
         $schedule->command('notificaciones:recordatorios-pago pago')
-            //->monthlyOn(3, '10:00')
-            ->everyMinute()
+            ->monthlyOn(3, '10:00')
+            //->everyMinute()
             ->timezone('America/Mexico_City')
             ->withoutOverlapping();
 
         //recordatorio para clientes con deuda
         $schedule->command('notificaciones:recordatorios-pago deuda')
-            //->monthlyOn(10, '10:00')
-             ->everyMinute()
+            ->monthlyOn(10, '10:00')
+            //->everyMinute()
             ->timezone('America/Mexico_City')
-            ->withoutOverlapping();        
+            ->withoutOverlapping();         
     }
 
     /**
