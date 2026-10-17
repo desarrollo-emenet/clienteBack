@@ -56,7 +56,7 @@ class NotificacionPushController extends Controller
         ], 200);
     }
 
-    /*public function testPushNotification(Request $request, notifiService $fcmService)
+    public function testPushNotification(Request $request, notifiService $fcmService)
     {
         $request->validate([
             'user_id' => 'required|integer',
@@ -91,5 +91,5 @@ class NotificacionPushController extends Controller
             'success' => false,
             'message' => 'No se pudo enviar, verifica los logs de Laravel.'
         ], 400);
-    }*/
+    }
 }

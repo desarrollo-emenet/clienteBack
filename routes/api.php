@@ -47,7 +47,7 @@ route::middleware(['auth:sanctum'])->group(function () {
 
 });
 
-     //Route::post('/devices/test-notification', [NotificacionPushController::class, 'testPushNotification']);
+     Route::post('/devices/test-notification', [NotificacionPushController::class, 'testPushNotification']);
 
 Route::post('/pagoralia/invoice', [PagoraliaController::class, 'desencriptarInvoice']);
 
