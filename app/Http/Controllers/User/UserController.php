@@ -132,4 +132,16 @@ class UserController extends Controller
             ], 500);
         }
     }
+
+    public function consultarEmail(storeRequest $request){
+        try {
+            return $this->userService->consultarEmail($request->numero_cliente);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al crear la cuenta',
+                //'error'   => $e->getMessage(),
+            ], 500);
+        }
+
+    }
 }

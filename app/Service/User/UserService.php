@@ -28,6 +28,27 @@ class UserService
         $this->validarService = $validarService;
     }
 
+    public function consultarEmail(string $numeroCliente)
+    {
+        $validacion = $this->validarService->validarClienteCompleto($numeroCliente);
+        if ($validacion instanceof \Illuminate\Http\JsonResponse) {
+            return $validacion;
+        }
+        $email = $validacion['email'];
+
+        //ocultar correo
+        [$usuario, $dominio] = explode('@', $email, 2);
+
+        $visible = mb_substr($usuario, 0, min(4, mb_strlen($usuario)));
+        $oculto = $visible . str_repeat('*', max(4, mb_strlen($usuario) - mb_strlen($visible)));
+
+        $correoOculto = $oculto . '@' . $dominio;
+
+        return response()->json([
+            'status' => 'success',
+            'correo' => $correoOculto,
+        ], 200);
+    }
     public function existeCliente(string $numeroCliente)
     {
         // Validar el cliente con el servicio
@@ -41,7 +62,7 @@ class UserService
 
         $email = $validacion['email']; // Extraer el email del cliente validado
         $serviceExistente = Service::where('numero_cliente', $numeroCliente)->first();
-        
+
         $correoExistente = $this->validarService->validarCorreoDisponible($email);
         if ($correoExistente instanceof \Illuminate\Http\JsonResponse) {
             Log::error('Error al validar correo: ' . $correoExistente->getContent());
@@ -102,14 +123,14 @@ class UserService
         ]);
 
         //Evento de registro
-        $user->notify(new VerifyEmailNotification($passwordTemporal,null,'create_account'));
+        $user->notify(new VerifyEmailNotification($passwordTemporal, null, 'create_account'));
         DB::commit();
         return response()->json([
             'mensaje' => 'Registro creado correctamente',
             'user'    => $user,
         ], 201);
     }
- 
+
     public function update(User $user, $data)
     {
         $email = $data['email'] ?? null;
@@ -173,6 +194,5 @@ class UserService
             'mensaje' => 'Avatar actualizado correctamente',
             'data'    => $user->fresh(),
         ], 200);
-        
     }
 }

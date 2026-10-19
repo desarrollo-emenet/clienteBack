@@ -44,12 +44,9 @@ route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('/devices/save-token-noti', [NotificacionPushController::class, 'saveTokenNoti']);
     Route::delete('/devices/delete-token-noti', [NotificacionPushController::class, 'deleteTokenNoti']);
-
 });
 
-     Route::post('/devices/test-notification', [NotificacionPushController::class, 'testPushNotification']);
-
-Route::post('/pagoralia/invoice', [PagoraliaController::class, 'desencriptarInvoice']);
+Route::post('/devices/test-notification', [NotificacionPushController::class, 'testPushNotification']);
 
 
 //Controlador de verificacion
@@ -65,6 +62,7 @@ Route::post('/email/verification-notification', function (Request $request) {
 
 //rutas controlador usuario
 Route::apiResource('usuarios', UserController::class);
+Route::post('consultarEmail', [UserController::class, 'consultarEmail']);
 Route::middleware('auth:sanctum')->get('cliente/{numero}', [UserController::class, 'clientePorNumero']);
 
 

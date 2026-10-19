@@ -60,7 +60,7 @@ class validarService
     {
         $email = $clienteData['cliente']['correo'] ?? null;
 
-        //$email = 'mgulmrtinz05@gmail.com';
+        //$email = 'm@gmail.com';
 
         if (!filter_var(trim($email), FILTER_VALIDATE_EMAIL)) return response()->json([
             'success' => "error",
