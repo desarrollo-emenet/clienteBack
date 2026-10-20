@@ -43,7 +43,7 @@ class UserService
         $oculto = $visible . str_repeat('*', max(4, mb_strlen($usuario) - mb_strlen($visible)));
         $asteriscos = $oculto . str_repeat('*', max(2, mb_strlen($usuario) - mb_strlen($oculto)));
 
-        $correoOculto = $oculto . $asteriscos . '@' . $dominio;
+        $correoOculto = $asteriscos . '@' . $dominio;
 
         return response()->json([
             'status' => 'success',
