@@ -2,7 +2,7 @@
 
 namespace App\Service\servicios;
 
-use App\Models\User;
+use App\Models\UserClientApp;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class validarService
@@ -58,9 +58,9 @@ class validarService
 
     public static function obtenerEmail(array $clienteData): string|JsonResponse
     {
-        $email = $clienteData['cliente']['correo'] ?? null;
+        //$email = $clienteData['cliente']['correo'] ?? null;
 
-        //$email = 'jeydelirzu@necub.com';
+        $email = 'marcos@iconcubic.com';
 
         if (!filter_var(trim($email), FILTER_VALIDATE_EMAIL)) return response()->json([
             'success' => "error",
@@ -72,7 +72,7 @@ class validarService
 
     public static function validarCorreoDisponible(string $email): ?JsonResponse
     {
-        if (User::where('email', $email)->exists()) {
+        if (UserClientApp::where('email', $email)->exists()) {
             return response()->json([
                 'message' => 'El correo de este cliente ya ha sido registrado',
             ], 409);

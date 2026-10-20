@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\clientMetadata;
-use App\Models\User;
+use App\Models\UserClientApp;
 use App\Service\Notificaciones\notifiService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -44,7 +44,7 @@ class EnviarRecordatoriosPago extends Command
         $total = 0;
         $enviados = 0;
 
-        User::query()
+        UserClientApp::query()
             ->whereHas('clientMetadata')
             ->with('clientMetadata')
             ->chunkById(100, function ($usuarios) use ( $notifiService, $tipo, &$total, &$enviados ) {

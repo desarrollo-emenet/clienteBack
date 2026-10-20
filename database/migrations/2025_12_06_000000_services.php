@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('numero_cliente')->unique();
 
             // FK al usuario
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('users_client_app')->cascadeOnDelete();
             $table->timestamps();
             $table->index('user_id');
         });

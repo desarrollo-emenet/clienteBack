@@ -26,7 +26,7 @@ class ServiceVerification extends Model
     //relacion con el usuario
     public function user()
     {
-        return $this->belongsTo(User::class);   
+        return $this->belongsTo(UserClientApp::class, 'user_id');   
     }
     public function isExpired(): bool
     {

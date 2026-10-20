@@ -5,13 +5,13 @@ namespace App\Http\Controllers\User;
 use App\Models\Service;
 use App\Service\User\UserService;
 use Illuminate\Http\Request;
-use App\Models\User;
 use App\Service\servicios\validarService;
 use App\Http\Controllers\Controller;
 use App\Service\User\metadataService;
 use Illuminate\Support\Facades\DB;
 use App\Http\Requests\users\storeRequest;
 use App\Http\Requests\users\updateRequest;
+use App\Models\UserClientApp;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -32,7 +32,7 @@ class UserController extends Controller
     }
 
     public static $rulesUpdate = [
-        'email' => 'nullable|email|max:50|unique:users,email,',
+        'email' => 'nullable|email|max:50|unique:users_client_app,email,',
         'old_password' => 'required|string',
         'password'  => 'nullable|string|min:8',
     ];
@@ -42,7 +42,7 @@ class UserController extends Controller
         //return User::all();
         return response()->json([
             'message' => 'Lista de usuarios',
-            'data' => User::all(),
+            'data' => UserClientApp::all(),
             'servicios' => Service::all()
         ], 200);
     }
@@ -105,7 +105,7 @@ class UserController extends Controller
     {
         try {
             DB::beginTransaction();
-            $user = User::findOrFail($id);
+            $user = UserClientApp::findOrFail($id);
             return $this->userService->update($user, $request);
         } catch (\Exception $e) {
             DB::rollback();

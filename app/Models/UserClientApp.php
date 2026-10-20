@@ -9,11 +9,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable implements MustVerifyEmail
+class UserClientApp extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
 
+    protected $table = 'users_client_app';
+    
     public function sendEmailVerificationNotification()
     {
         $this->notify(new VerifyEmailNotification($this->passwordTemporal));
@@ -53,7 +55,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function servicios()
     {
-        return $this->hasMany(Service::class);
+        return $this->hasMany(Service::class, 'user_id');
     }
 
     public function serviceVerifications()

@@ -31,7 +31,7 @@ class updateRequest extends FormRequest
                 'nullable',
                 'email',
                 'max:50',
-                'unique:users,email,' . $id,
+                'unique:users_client_app,email,' . $id,
             ],
             'old_password' => 'required|string',
             'password' => 'nullable|string|min:8',

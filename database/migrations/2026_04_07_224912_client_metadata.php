@@ -17,7 +17,7 @@ return new class extends Migration
         $table->id();
 
         // Relación con usuario
-        $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+        $table->foreignId('user_id')->constrained('users_client_app')->cascadeOnDelete();
         $table->string('numero_cliente');
         $table->json('metadata')->nullable();
         $table->timestamp('last_updated_at')->nullable(); // para TTL

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Llave foránea a los usuarios
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('users_client_app')->cascadeOnDelete();
 
         });
     }

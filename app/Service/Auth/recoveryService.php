@@ -3,7 +3,7 @@
 namespace App\Service\Auth;
 
 use App\Mail\RecoverPasswordMail;
-use App\Models\User;
+use App\Models\UserClientApp;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -34,7 +34,7 @@ class recoveryService
 
     public function validateEmail(String $email): bool
     {
-        return User::where('email', $email)->exists();
+        return UserClientApp::where('email', $email)->exists();
     }
 
     private function send(String $email)
@@ -122,7 +122,7 @@ class recoveryService
             "message" => "El enlace anterior no es válido, envia una nueva solicitud"
         ], 404);
         // Actualizar la contraseña del usuario
-        $user = User::where('email', $token->email)->first();
+        $user = UserClientApp::where('email', $token->email)->first();
         if (!$user) return response()->json([
             "status" => "error",
             "message" => "Usuario no encontrado."

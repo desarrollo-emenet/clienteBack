@@ -3,7 +3,7 @@
 namespace App\Service\Auth;
 
 use App\Models\Service;
-use App\Models\User;
+use App\Models\UserClientApp;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
@@ -11,7 +11,7 @@ class authService
 {
     public function login($request)
     {
-        $user = User::from('users as u')
+        $user = UserClientApp::from('users_client_app as u')
             ->select('u.*', 's.numero_cliente')
             ->join("services as s", 'u.id', 's.user_id')
             ->where('email', $request->cliente)

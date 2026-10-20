@@ -3,7 +3,7 @@
 namespace App\Service\User;
 
 use App\Models\Service;
-use App\Models\User;
+use App\Models\UserClientApp;
 use App\Models\UserDevicesToken;
 use App\Notifications\VerifyEmailNotification;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +16,7 @@ class UserService
 {
 
     public static $rulesUpdate = [
-        'email' => 'nullable|email|max:50|unique:users,email,',
+        'email' => 'nullable|email|max:50|unique:users_client_app,email,',
         'old_password' => 'required|string',
         'password'  => 'nullable|string|min:8',
     ];
@@ -80,7 +80,7 @@ class UserService
     public function esVerificado($serviceExistente, string $email)
     {
         // Buscar si ya existe el número de cliente
-        $user = User::find($serviceExistente->user_id);
+        $user = UserClientApp::find($serviceExistente->user_id);
         // Si no ha verificado el correo
         if (is_null($user->email_verified_at)) {
             // Generar nueva contraseña temporal
@@ -113,7 +113,7 @@ class UserService
         $passwordTemporal = Random::generate(8);
         log::info('crearCliente', ['numeroCliente' => $numeroCliente, 'email' => $email, 'passwordTemporal' => $passwordTemporal]);
         //guardar en tabla users email y password
-        $user = User::create([
+        $user = UserClientApp::create([
             'email'    => $email,
             'password' => Hash::make($passwordTemporal), //contraseña temporal
         ]);
@@ -132,7 +132,7 @@ class UserService
         ], 201);
     }
 
-    public function update(User $user, $data)
+    public function update(UserClientApp $user, $data)
     {
         $email = $data['email'] ?? null;
         $password = $data['password'] ?? null;
@@ -187,7 +187,7 @@ class UserService
         }
     }
 
-    public function updateAvatar(User $user, string $avatarUrl)
+    public function updateAvatar(UserClientApp $user, string $avatarUrl)
     {
         $user->avatar_url = $avatarUrl;
         $user->save();

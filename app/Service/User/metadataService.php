@@ -3,7 +3,7 @@
 namespace App\Service\User;
 
 use App\Models\clientMetadata;
-use App\Models\User;
+use App\Models\UserClientApp;
 use App\Service\servicios\consultaApiService;
 use App\Service\servicios\validarService;
 use Illuminate\Support\Facades\Cache;
@@ -20,7 +20,7 @@ class metadataService
         $this->validarService = $validarService;
     }
 
-    public function getMetadataForCliente(string $numeroCliente, User $user)
+    public function getMetadataForCliente(string $numeroCliente, UserClientApp $user)
     {
         //datos de cache
         $cacheKey = $this->getCacheKey($user, $numeroCliente);
@@ -66,7 +66,7 @@ class metadataService
 
 
     //actualizar metadata sino la crea
-    public function refresh(User $user, string $numeroCliente)
+    public function refresh(UserClientApp $user, string $numeroCliente)
     {
         $data =  $this->consultarApiService->peticionAPI($numeroCliente, 'false');
 
@@ -94,13 +94,13 @@ class metadataService
     }
 
     //obtener metadata de la cache
-    private function getCacheKey(User $user, string $numeroCliente)
+    private function getCacheKey(UserClientApp $user, string $numeroCliente)
     {
         return "client_metadata_{$user->id}_{$numeroCliente}";
     }
 
     //eliminar metadata de cache y base de datos
-    public function eliminarMetadata(User $user, string $numeroCliente)
+    public function eliminarMetadata(UserClientApp $user, string $numeroCliente)
     {
         $cacheKey = $this->getCacheKey($user, $numeroCliente);
         Cache::forget($cacheKey);

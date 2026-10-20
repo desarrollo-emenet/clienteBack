@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Service;
-use App\Models\User;
+use App\Models\UserClientApp;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -15,7 +15,7 @@ class LimpiarRegistrosTemporales extends Command
 
     public function handle()
     {
-       $usuarios = User::whereNull('email_verified_at')
+       $usuarios = UserClientApp::whereNull('email_verified_at')
             //->where('updated_at', '<=', now()->subDays(7))
             ->where('created_at', '<=', now()->subMinutes(1)) 
             ->get();

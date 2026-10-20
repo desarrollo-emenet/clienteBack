@@ -4,7 +4,7 @@ namespace App\Service\Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Verified;
-use App\Models\User;
+use App\Models\UserClientApp;
 use App\Models\UserDevicesToken;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -19,7 +19,7 @@ class verifyMailServices
     public function verify(Request $request, string $id, string $hash)
     {
         // Buscar el usuario por ID
-        $user = User::findOrFail($id);
+        $user = UserClientApp::findOrFail($id);
         $email = $request->input('email');
         $type = $request->input('type');
 
@@ -39,7 +39,7 @@ class verifyMailServices
         if ($email !== $user->email) {
 
             // Verificar que el correo todavía esté disponible
-            $correoExiste = User::where('email', $email)
+            $correoExiste = UserClientApp::where('email', $email)
                 ->where('id', '!=', $user->id)
                 ->exists();
 
@@ -87,7 +87,7 @@ class verifyMailServices
     }
 
     //redireccion al frontend con token
-    private function redirectToFrontend(User $user)
+    private function redirectToFrontend(UserClientApp $user)
     {
         $this->urlFrontend = env('FRONTEND_URL_LOCAL');
 

@@ -25,7 +25,7 @@ return new class extends Migration
 
             // FK al usuario
             $table->foreignId('user_id')
-                  ->constrained('users')
+                  ->constrained('users_client_app')
                   ->cascadeOnDelete();
         });
     }
