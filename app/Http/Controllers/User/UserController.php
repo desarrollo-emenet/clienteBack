@@ -124,7 +124,7 @@ class UserController extends Controller
             ]);
 
             $user = auth()->user();
-            return $this->userService->updateAvatar( $user, $request->avatar_url );
+            return $this->userService->updateAvatar($user, $request->avatar_url);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Error al actualizar el avatar',
@@ -133,7 +133,8 @@ class UserController extends Controller
         }
     }
 
-    public function consultarEmail(storeRequest $request){
+    public function consultarEmail(storeRequest $request)
+    {
         try {
             return $this->userService->consultarEmail($request->numero_cliente);
         } catch (\Exception $e) {
@@ -142,6 +143,24 @@ class UserController extends Controller
                 //'error'   => $e->getMessage(),
             ], 500);
         }
+    }
 
+
+    public function destroy($id)
+    {
+        try {
+            DB::transaction(function () use ($id) {
+                $user = UserClientApp::findOrFail($id);
+                $user->delete();
+            });
+            return response()->json([
+                'message' => "Usuario eliminado",
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al crear la cuenta',
+                //'error'   => $e->getMessage(),
+            ], 500);
+        }
     }
 }

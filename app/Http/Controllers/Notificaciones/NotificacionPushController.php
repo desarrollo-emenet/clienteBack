@@ -60,24 +60,14 @@ class NotificacionPushController extends Controller
     {
         $request->validate([
             'user_id' => 'required|integer',
-            'tipo'    => 'required|string' // 'pago' o 'deuda'
+            'titulo' => 'required|string',
+            'body' => 'required|string',
         ]);
-
-
-
-        // mensajes adaptados según el tipo de notificación de angular
-        $title = $request->tipo === 'pago' ? '¡Recordatorio de Pago!' : 'Deuda Pendiente Detectada';
-        $body = $request->tipo === 'pago' ? 'Tu forma de pago requiere atención inmediata.' : 'Revisa tu estado de cuenta para ver los cargos.';
-
-        //avisos en zona
-        //
-
 
         $enviado = $fcmService->enviarNotificacionPush(
             $request->user_id,
-            $title,
-            $body,
-            ['tipo' => $request->tipo]
+            $request->titulo,
+            $request->body,
         );
 
         if ($enviado) {
