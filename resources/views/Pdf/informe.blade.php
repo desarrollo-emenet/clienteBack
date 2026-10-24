@@ -203,7 +203,7 @@
                                     </div>
                                     <div>
                                         <span class="payment-label">Beneficiario:</span>
-                                        <span class="payment-value">IPTVTEL COMUNICACIONES</span>
+                                        <span class="payment-value">IPTVTEL comunicaciones</span>
                                     </div>
                                 </div>
                             </td>
@@ -229,7 +229,7 @@
                                     </div>
                                     <div>
                                         <span class="payment-label">Beneficiario:</span>
-                                        <span class="payment-value">IPTVTEL COMUNICACIONES</span>
+                                        <span class="payment-value">IPTVTEL comunicaciones</span>
                                     </div>
                                 </div>
                             </td>
@@ -263,7 +263,7 @@
     </div>
 
     <div class="footer">
-        <strong>IPTVTEL Comunicaciones S. DE R.L. DE C.V.</strong>· 713 133 4557 Ext 1 · clientes@emenet.mx
+        <strong>IPTVTEL comunicaciones S. DE R.L. DE C.V.</strong>· 713 133 4557 Ext 1 · clientes@emenet.mx
     </div>
 </body>
 

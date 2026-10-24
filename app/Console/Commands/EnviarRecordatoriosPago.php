@@ -113,7 +113,7 @@ class EnviarRecordatoriosPago extends Command
                     /*if ($enviado) {
                         $enviados++;
 
-                        Log::info('Recordatorio EMENET enviado', [
+                        Log::info('Recordatorio emenet enviado', [
                             'user_id' => $usuario->id,
                             'tipo' => $tipo,
                             'servicios_activos' => count($servicios),

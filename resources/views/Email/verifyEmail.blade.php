@@ -63,7 +63,7 @@
                                 de Correo</h2>
 
                             <p style="margin:0 0 18px 0; color:#283142; font-size:14px; line-height:1.6;">
-                                Confirma el correo registrado a tu cuenta de<strong> emenet Comunicaciones</strong>,
+                                Confirma el correo registrado a tu cuenta de<strong> emenet comunicaciones</strong>,
                                 para continuar haz click en el siguiente enlace
                             </p>
 
@@ -132,7 +132,7 @@
                     <tr>
                         <td
                             style="padding:18px 32px 28px 32px; text-align:center;background: lightgray; font-size:12px;">
-                            © {{ date('Y') }} emenet Comunicaciones. Todos los derechos reservados.<br>
+                            © {{ date('Y') }} emenet comunicaciones. Todos los derechos reservados.<br>
                             <div style="margin-top:8px; font-size:11px;">
                                 No compartas informacion personal
                             </div>

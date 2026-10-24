@@ -49,7 +49,7 @@
                     <tr>
                         <td>
                             <img src="{{ $message->embed(public_path('img/emenetLogo.png')) }}"
-                                alt="Logo Emenet" width="150"
+                                alt="Logo emenet" width="150"
                                 style="max-width: 200px; height: auto; display: block; margin: 20px auto;" />
                         </td>
                     </tr>
@@ -63,7 +63,7 @@
                             </h2>
 
                             <p style="margin:0 0 18px 0; color:#283142; font-size:14px; line-height:1.6;">
-                                Estás a punto de registrar un servicio nuevo en <strong>emenet Comunicaciones</strong>.
+                                Estás a punto de registrar un servicio nuevo en <strong>emenet comunicaciones</strong>.
                                 Para continuar, utiliza el siguiente código de verificación:
                             </p>
 
@@ -128,7 +128,7 @@
                     <tr>
                         <td
                             style="padding:18px 32px 28px 32px; text-align:center; background:lightgray; font-size:12px;">
-                            © {{ date('Y') }} emenet Comunicaciones. Todos los derechos reservados.<br>
+                            © {{ date('Y') }} emenet comunicaciones. Todos los derechos reservados.<br>
                             <div style="margin-top:8px; font-size:11px;">
                                 No compartas información personal
                             </div>
