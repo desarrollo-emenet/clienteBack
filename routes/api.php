@@ -45,7 +45,7 @@ route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/devices/save-token-noti', [NotificacionPushController::class, 'saveTokenNoti']);
     Route::delete('/devices/delete-token-noti', [NotificacionPushController::class, 'deleteTokenNoti']);
 
-    Route::delete('/usuarios/{id}', [UserController::class, 'destroy']);
+    Route::delete('/eliminarCuenta', [UserController::class, 'destroy']);
 });
 
 Route::post('/devices/test-notification', [NotificacionPushController::class, 'testPushNotification']);

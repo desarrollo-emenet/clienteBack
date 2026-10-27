@@ -13,7 +13,7 @@ use App\Http\Requests\users\storeRequest;
 use App\Http\Requests\users\updateRequest;
 use App\Models\UserClientApp;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Hash;
 
 //use Illuminate\Support\Facades\Log;
 
@@ -146,20 +146,46 @@ class UserController extends Controller
     }
 
 
-    public function destroy($id)
+    public function destroy(Request $request)
     {
+        $request->validate([
+            'password' => ['required', 'string'],
+        ]);
+
+
+        $user = $request->user();
+        if (!$user || !$user instanceof UserClientApp) {
+            return response()->json([
+                'message' => 'No se pudo identificar al usuario autenticado.',
+            ], 401);
+        }
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'message' => 'La contraseña actual es incorrecta.',
+                'errors' => [
+                    'password' => ['La contraseña actual es incorrecta.'],
+                ],
+            ], 422);
+        }
+
         try {
-            DB::transaction(function () use ($id) {
-                $user = UserClientApp::findOrFail($id);
+            DB::transaction(function () use ($user) {
+                $user->tokens()->delete();
                 $user->delete();
             });
+
             return response()->json([
-                'message' => "Usuario eliminado",
+                'message' => 'La cuenta se eliminó correctamente.',
             ], 200);
-        } catch (\Exception $e) {
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'Error al crear la cuenta',
-                //'error'   => $e->getMessage(),
+                'message' => 'No se encontró la cuenta.',
+            ], 404);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return response()->json([
+                'message' => 'No fue posible eliminar la cuenta.',
             ], 500);
         }
     }
