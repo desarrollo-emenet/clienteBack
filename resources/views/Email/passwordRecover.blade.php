@@ -50,7 +50,7 @@
                     <!-- Header -->
                     <tr>
                         <td >
-                            <img src="{{ $message->embed(public_path('img/emenetLogo.png')) }}" alt="Logo emenet" width="150"
+                            <img src="{{ $message->embed(public_path('img/logoISP.png')) }}" alt="Logo emenet" width="150"
 
                                 style="max-width: 200px; height: auto; display: block; margin: 0 auto;" />
 

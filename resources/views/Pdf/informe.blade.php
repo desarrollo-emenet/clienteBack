@@ -14,7 +14,7 @@
         <table class="header-table">
             <tr>
                 <td class="logo">
-                    <img src="https://clientes.emenet.mx/assets/img/emenetLogo.png">
+                    <img src="https://desarrollo.emenet.mx/template/gennegro.png">
                 </td>
                 <td class="header-info">
                     <div class="header-title">Informe trimestral</div>
