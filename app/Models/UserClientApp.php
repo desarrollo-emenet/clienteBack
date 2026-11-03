@@ -65,7 +65,7 @@ class UserClientApp extends Authenticatable implements MustVerifyEmail
 
     public function clientMetadata()
     {
-        return $this->hasMany(ClientMetadata::class);
+        return $this->hasMany(ClientMetadata::class,  'user_id', 'id');
     }
 
     public function routeNotificationForMail($notification)
