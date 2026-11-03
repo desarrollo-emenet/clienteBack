@@ -15,7 +15,7 @@ class UserClientApp extends Authenticatable implements MustVerifyEmail
 
 
     protected $table = 'users_client_app';
-    
+
     public function sendEmailVerificationNotification()
     {
         $this->notify(new VerifyEmailNotification($this->passwordTemporal));
@@ -65,7 +65,7 @@ class UserClientApp extends Authenticatable implements MustVerifyEmail
 
     public function clientMetadata()
     {
-        return $this->hasMany(ClientMetadata::class,  'user_id', 'id');
+        return $this->hasMany(clientMetadata::class,  'user_id', 'id');
     }
 
     public function routeNotificationForMail($notification)
