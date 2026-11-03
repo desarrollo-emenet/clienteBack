@@ -19,15 +19,13 @@ class Kernel extends ConsoleKernel
         $schedule->command('notificaciones:recordatorios-pago pago')
             ->monthlyOn(3, '10:00')
             //->everyMinute()
-            ->timezone('America/Mexico_City')
-            ->withoutOverlapping();
+            ->timezone('America/Mexico_City');
 
         //recordatorio para clientes con deuda
         $schedule->command('notificaciones:recordatorios-pago deuda')
             ->monthlyOn(10, '10:00')
             //->everyMinute()
-            ->timezone('America/Mexico_City')
-            ->withoutOverlapping();         
+            ->timezone('America/Mexico_City');         
     }
 
     /**
@@ -41,7 +39,7 @@ class Kernel extends ConsoleKernel
 
         require base_path('routes/console.php');
 
-        //\App\Console\Commands\LimpiarRegistrosTemporales::class;
+        \App\Console\Commands\LimpiarRegistrosTemporales::class;
 
     }
 }
