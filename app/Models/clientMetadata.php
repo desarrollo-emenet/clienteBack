@@ -17,4 +17,9 @@ class clientMetadata extends Model
         'metadata' => 'array',
         'last_updated_at' => 'datetime',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(UserClientApp::class, 'user_id', 'id');
+    }
 }
