@@ -86,7 +86,7 @@ class metadataService
             ]
         );
 
-        
+
         $cacheKey = $this->getCacheKey($user, $numeroCliente);
         // Guardar en cache
         Cache::put($cacheKey, $clientMetadata->metadata, now()->addHours(self::TTL_HOURS));
