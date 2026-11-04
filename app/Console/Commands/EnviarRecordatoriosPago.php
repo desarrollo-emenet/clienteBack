@@ -52,17 +52,21 @@ class EnviarRecordatoriosPago extends Command
                     $total++;
                     $servicios = [];
 
+                    //Revisar clasificación y deuda de cada servicio del cliente
                     foreach ($usuario->clientMetadata as $metadata) {                        
                         $clasificacion = strtoupper(trim((string) data_get( $metadata->metadata, 'cliente.clasificacion', '' )));
 
+                        //Si el cliente tiene clasificacion BAJA, no enviar notificacion
                         if ($clasificacion === 'BAJA') {
                             continue;
                         }
 
+                        //Obtener deuda
                         $deuda = (float) data_get($metadata->metadata, 'cliente.deuda', 0 );
                         $numero = data_get( $metadata->metadata, 'cliente.cliente', $metadata->numero_cliente );
                         $nombre = data_get( $metadata->metadata, 'cliente.nombre', 'Cliente' );
 
+                        //Agregar servicio a la lista
                         $servicios[] = [
                             'numero' => $numero,
                             'nombre' => $nombre,
@@ -72,8 +76,10 @@ class EnviarRecordatoriosPago extends Command
 
                     if (empty($servicios)) { continue; }
 
+                    //Filtrar servicios con deuda
                     $conDeuda = array_values(array_filter( $servicios, fn($s) => $s['deuda'] > 0 ));
 
+                    //Si el tipo es deuda y no hay servicios con deuda, no enviar notificación
                     if ($tipo === 'deuda' && empty($conDeuda)) { continue; }
                     $nombre = $servicios[0]['nombre'] ?? 'Cliente';
 
@@ -82,11 +88,13 @@ class EnviarRecordatoriosPago extends Command
                         $body = "Hola {$nombre}, recuerda que las " .
                             "fechas de pago son del 1 al 5 de cada mes.";
                     } else {
+                        //Si el tipo es deuda, enviar notificación con detalle de servicios con adeudo
                         $cantidad = count($conDeuda);
                         $totalDeuda = array_sum( array_column($conDeuda, 'deuda') );
 
                         $detalle = [];
 
+                        //Crear notificaciones para servicios con adeudo
                         foreach ($conDeuda as $servicio) {
                             $detalle[] = "{$servicio['numero']}: adeudo de $" .
                                 number_format($servicio['deuda'], 2);
@@ -99,6 +107,7 @@ class EnviarRecordatoriosPago extends Command
                             number_format($totalDeuda, 2) . '. ' . implode('; ', $detalle);
                     }
 
+                    //Enviar notificación push 
                     $enviado = $notifiService->enviarNotificacionPush(
                         (int) $usuario->id,
                         $title,

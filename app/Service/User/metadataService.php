@@ -2,7 +2,7 @@
 
 namespace App\Service\User;
 
-use App\Models\ClientMetadata;
+use App\Models\clientMetadata;
 use App\Models\UserClientApp;
 use App\Service\servicios\consultaApiService;
 use App\Service\servicios\validarService;
