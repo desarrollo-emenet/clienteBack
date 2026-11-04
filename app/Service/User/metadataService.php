@@ -2,7 +2,7 @@
 
 namespace App\Service\User;
 
-use App\Models\clientMetadata;
+use App\Models\ClientMetadata;
 use App\Models\UserClientApp;
 use App\Service\servicios\consultaApiService;
 use App\Service\servicios\validarService;
@@ -32,7 +32,7 @@ class metadataService
         }
 
         //Buscar registro existente
-        $clientMetadata = clientMetadata::where('user_id', $user->id)
+        $clientMetadata = ClientMetadata::where('user_id', $user->id)
             ->where('numero_cliente', $numeroCliente)
             ->first();
 
@@ -55,7 +55,7 @@ class metadataService
     }
 
     // Verificar si el metadata ha expirado 1 hora
-    private function isExpired(clientMetadata $clientMetadata)
+    private function isExpired(ClientMetadata $clientMetadata)
     {
         if (!$clientMetadata->last_updated_at) return true;
 
@@ -75,7 +75,7 @@ class metadataService
         }
 
 
-        $clientMetadata = clientMetadata::updateOrCreate(
+        $clientMetadata = ClientMetadata::updateOrCreate(
             [
                 'user_id' => $user->id,
                 'numero_cliente' => $numeroCliente
@@ -104,6 +104,6 @@ class metadataService
     {
         $cacheKey = $this->getCacheKey($user, $numeroCliente);
         Cache::forget($cacheKey);
-        clientMetadata::where('user_id', $user->id)->where('numero_cliente', $numeroCliente)->delete();
+        ClientMetadata::where('user_id', $user->id)->where('numero_cliente', $numeroCliente)->delete();
     }
 }
